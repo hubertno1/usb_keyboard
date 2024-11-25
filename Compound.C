@@ -857,7 +857,7 @@ void compound_process_recv_data(UINT8 len)
 		if (!first_hb_flag)
 		{
 			first_hb_flag = 1;
-			enable_reset_timer();
+			// enable_reset_timer();
 			timer0_register_cb(led_flash_handler);
 
 		}
