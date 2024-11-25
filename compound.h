@@ -16,6 +16,10 @@ extern UINT16I 	TouchKeyButton;
 extern	void 	USBDeviceInit();
 extern	void 	HIDValueHandle();
 void usb_send_key (char *p);
+void compound_process_recv_data(UINT8 len);
+
+extern volatile UINT8 g_data_ready;
+extern volatile UINT8 g_data_len;
 	
 #endif
 /**************************** END *************************************/

@@ -44,7 +44,7 @@ void led_flash_handler(void)
     if(++cnt >= 50) 
     {  
         cnt = 0;
-        soft_reset();
+        // soft_reset();
     }
 }
 
@@ -108,7 +108,13 @@ void main(void)
   {
 
     	if (EnumOK)
-      {	
+      {
+          if (g_data_ready)
+          {
+              compound_process_recv_data(g_data_len);
+              g_data_ready = 0;
+          }
+
           // HIDValueHandle();		 // 处理HID数据
           key_scan();
       }

@@ -53,7 +53,8 @@ UINT8 HIDKey[8] = {0};
 
 static UINT8 compound_received_data[BUFFER_SIZE] = {0};										// 存储从PC中接收的数据
 static UINT8 compound_response_data[BUFFER_SIZE] = {0};
-
+volatile UINT8 g_data_ready;
+volatile UINT8 g_data_len;
 
 /**************************** Device Descriptor *************************************/
 UINT8C DevDesc[18] = {																// Device Descriptor
@@ -232,8 +233,9 @@ void DeviceInterrupt( void ) interrupt INT_NO_USB using 1                      	
 			}
 
 			memcpy(compound_received_data, Ep2Buffer, len);
-
-			compound_process_recv_data(len);
+			g_data_len = len;
+			g_data_ready = 1;
+			// compound_process_recv_data(len);
 			
 			UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_R_RES | UEP_R_RES_ACK;           		// Default return ACK
 			
@@ -788,6 +790,8 @@ void compound_process_recv_data(UINT8 len)
     UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
 
 }
+
+
 
 
 
