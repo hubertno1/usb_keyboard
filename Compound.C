@@ -62,8 +62,10 @@ volatile UINT8 g_data_len;
 #define DEVICE_VID_H     0x51    // VID高字节
 #define DEVICE_PID_L     0x07    // PID低字节
 #define DEVICE_PID_H     0x20    // PID高字节
-
-
+static UINT8 first_hb_flag = 0;
+extern void soft_reset(void);
+extern void timer0_register_cb(void (*cb)(void));  // 声明timer注册函数
+extern void led_flash_handler(void);               // 声明回调函数
 
 /**************************** Device Descriptor *************************************/
 UINT8C DevDesc[18] = {																// Device Descriptor
@@ -849,6 +851,16 @@ void compound_process_recv_data(UINT8 len)
 		// 发送响应
         memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 10);  
         UEP2_T_LEN = 10;
+
+	    UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+
+		if (!first_hb_flag)
+		{
+			first_hb_flag = 1;
+			enable_reset_timer();
+			timer0_register_cb(led_flash_handler);
+
+		}
 	}
 
 
@@ -858,14 +870,11 @@ void compound_process_recv_data(UINT8 len)
     memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, len);
 
     UEP2_T_LEN = len;
+
+	UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+
 	}
 
 
-    UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-
 }
-
-
-
-
 

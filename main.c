@@ -44,7 +44,7 @@ void led_flash_handler(void)
     if(++cnt >= 50) 
     {  
         cnt = 0;
-        // soft_reset();
+        soft_reset();
     }
 }
 
@@ -101,7 +101,7 @@ void main(void)
   register_key_cb(handle_key_event);
 
   timer0_init_10ms();
-  timer0_register_cb(led_flash_handler);
+  // timer0_register_cb(led_flash_handler);
 
 
   while(1)
