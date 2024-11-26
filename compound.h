@@ -20,6 +20,8 @@ void compound_process_recv_data(UINT8 len);
 
 extern volatile UINT8 g_data_ready;
 extern volatile UINT8 g_data_len;
+extern volatile UINT8 g_compound_heartbeat_flag;
+extern volatile UINT8 g_compound_heartbeat_timer;
 	
 #endif
 /**************************** END *************************************/

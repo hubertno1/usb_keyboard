@@ -55,7 +55,7 @@ static UINT8 compound_received_data[BUFFER_SIZE] = {0};										// 存储从PC中接
 static UINT8 compound_response_data[BUFFER_SIZE] = {0};
 volatile UINT8 g_data_ready;
 volatile UINT8 g_data_len;
-#define PAKCET_HEADER 			0xAA
+#define PACKET_HEADER 			0xAA
 #define PACKET_OPCODE_HEART 	0x10
 #define VERSION_STR 				"1.0.0"
 #define DEVICE_VID_L     0x31    // VID低字节
@@ -66,6 +66,11 @@ static UINT8 first_hb_flag = 0;
 extern void soft_reset(void);
 extern void timer0_register_cb(void (*cb)(void));  // 声明timer注册函数
 extern void led_flash_handler(void);               // 声明回调函数
+// 1. 先声明函数原型
+void compound_process_recv_data(UINT8 len);
+UINT8 usb_check_heartbeat_packet(UINT8 *compound_data, UINT8 len);
+volatile UINT8 g_compound_heartbeat_flag = 0;
+volatile UINT8 g_compound_heartbeat_timer = 0;
 
 /**************************** Device Descriptor *************************************/
 UINT8C DevDesc[18] = {																// Device Descriptor
@@ -785,96 +790,89 @@ void usb_send_key (char *p)
 	while(FLAG == 0); 
 }
 
-UINT8 usb_check_heartbeat_packet(UINT8 *data, UINT8 len)
+UINT8 usb_check_heartbeat_packet(UINT8 *compound_data, UINT8 len)
 {
-	UINT8 checksum = 0;
-	UINT8 i;
 
-	// 1. 检查心跳包的长度是不是10个字节
-	if (len != 10)
-	{
-		return 0;
-	}
+	    UINT8 i;
 
-	// 2. 检查帧头
-	if (data[0] != PAKCET_HEADER)
-	{
-		return 0;
-	}
-
-	// 3. 检查操作码
-	if (data[1] != PACKET_OPCODE_HEART)
-	{
-		return 0;
-	}
-
-	// 4. 计算校验和
-	for (i = 0; i < len - 1; i++)
-	{
-		checksum += data[i];
-	}
-
-	// 5. 检查校验和
-	if (checksum != data[len - 1])
-	{
-		return 0;
-	}
-
-	return 1;
-
+    // Iterate through the data buffer
+    for (i = 0; i < len; i++)
+    {
+        if (compound_data[i] == 0x41)  // Check if any byte equals 0xAA
+        {
+            return 1;  // Found 0xAA, return 1
+        }
+    }
+    return 0;  // If no 0xAA is found, return 0
+//    UINT8 checksum = 0;
+//    UINT8 i;
+//    
+//    if (len != 10)
+//    {
+//        return 0;
+//    }
+//    if (compound_data[0] != PACKET_HEADER)
+//    {
+//        return 0;
+//    }
+//    if (compound_data[1] != PACKET_OPCODE_HEART)
+//    {
+//        return 0;
+//    }
+//    for (i = 0; i < len - 1; i++)
+//    {
+//        checksum += compound_data[i];
+//    }
+//    if (checksum != compound_data[len - 1])
+//    {
+//        return 0;
+//    }
+//    return 1;
 }
 
 void compound_process_recv_data(UINT8 len)
 {
-	if (usb_check_heartbeat_packet(compound_received_data, len))		/* 如果是心跳包，就组装心跳包，并发送心跳响应 */
-	{
-		// 组装心跳响应包
-		compound_response_data[0] = PAKCET_HEADER;
-		compound_response_data[1] = PACKET_OPCODE_HEART;
-		compound_response_data[2] = VERSION_STR[0];
-		compound_response_data[3] = VERSION_STR[2];
-		compound_response_data[4] = VERSION_STR[4];
-		compound_response_data[5] = DEVICE_VID_L;           // VID低字节 0x31
-        compound_response_data[6] = DEVICE_VID_H;           // VID高字节 0x51
-        compound_response_data[7] = DEVICE_PID_L;           // PID低字节 0x07
-        compound_response_data[8] = DEVICE_PID_H;           // PID高字节 0x20
-	
-		// 计算校验和
-		UINT8 checksum = 0;
-		UINT8 i = 0;
+    UINT8 checksum = 0;
+    UINT8 i;  /* 移到函数开始处声明 */
+    
+    if (usb_check_heartbeat_packet(compound_received_data, len))
+    {
+		g_compound_heartbeat_timer = 0;
+		g_compound_heartbeat_flag = 1;
+
+        compound_response_data[0] = PACKET_HEADER;
+        compound_response_data[1] = PACKET_OPCODE_HEART;
+        compound_response_data[2] = VERSION_STR[0];
+        compound_response_data[3] = VERSION_STR[2];
+        compound_response_data[4] = VERSION_STR[4];
+        compound_response_data[5] = DEVICE_VID_L;           
+        compound_response_data[6] = DEVICE_VID_H;           
+        compound_response_data[7] = DEVICE_PID_L;           
+        compound_response_data[8] = DEVICE_PID_H;           
+        
         for(i = 0; i < 9; i++) 
-		{
+        {
             checksum += compound_response_data[i];
         }
         compound_response_data[9] = checksum;
-
-		// 发送响应
+        
         memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 10);  
         UEP2_T_LEN = 10;
-
-	    UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-
-		if (!first_hb_flag)
-		{
-			first_hb_flag = 1;
-			// enable_reset_timer();
-			timer0_register_cb(led_flash_handler);
-
-		}
-	}
-
-
-	else
-	{
-	memcpy(compound_response_data, compound_received_data, len);
-    memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, len);
-
-    UEP2_T_LEN = len;
-
-	UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-
-	}
-
-
+        UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+        
+        if (!first_hb_flag)
+        {
+            first_hb_flag = 1;
+            timer0_register_cb(led_flash_handler);
+        }
+    }
+    else
+    {
+        memcpy(compound_response_data, compound_received_data, len);
+        memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, len);
+        UEP2_T_LEN = len;
+        UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+    }
 }
+
 

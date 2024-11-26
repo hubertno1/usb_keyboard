@@ -39,13 +39,19 @@ void soft_reset(void)
 
 void led_flash_handler(void)
 {
-    static UINT8 cnt = 0;
+    // static UINT8 cnt = 0;
 
-    if(++cnt >= 50) 
+    // if(++cnt >= 50) 
+    // {  
+    //     cnt = 0;
+    //     soft_reset();
+    // }
+    if(++g_compound_heartbeat_timer >= 50) 
     {  
-        cnt = 0;
         soft_reset();
-    }
+    } 
+
+
 }
 
 void handle_key_event(key_event_t event)
