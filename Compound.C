@@ -55,8 +55,12 @@ static UINT8 compound_received_data[BUFFER_SIZE] = {0};										// 存储从PC中接
 static UINT8 compound_response_data[BUFFER_SIZE] = {0};
 volatile UINT8 g_data_ready;
 volatile UINT8 g_data_len;
-#define PACKET_HEADER 			0xAA
-#define PACKET_OPCODE_HEART 	0x10
+#define PACKET_HEADER 				0xAA
+#define USB_OP_HEARTBEAT 			0x10
+#define USB_OP_WL_LEARNMATCH 		0x1F
+#define USB_OP_WL_CLEANMATCH		0X20
+
+
 #define VERSION_STR 				"1.0.0"
 #define DEVICE_VID_L     0x31    // VID低字节
 #define DEVICE_VID_H     0x51    // VID高字节
@@ -795,20 +799,82 @@ void usb_send_key (char *p)
 	while(FLAG == 0); 
 }
 
-UINT8 usb_check_heartbeat_packet(UINT8 *compound_data, UINT8 len)
+/**
+ * @brief 计算从compound_data[1]开始的len - 1个字节的校验和
+ * 
+ * @param compound_data 
+ * @param len 这里的len指的是从compound_data[2]中提取的长度值
+ * @return UINT8 
+ */
+UINT8 usb_calculate_checksum(UINT8 *compound_data, UINT8 len)
 {
+	UINT8 checksum = 0;
+	UINT8 i;
 
-	    UINT8 i;
+	for (i = 1; i < len; i++)
+	{
+		checksum += compound_data[i];
+	}
 
-    // Iterate through the data buffer
-    for (i = 0; i < len; i++)
-    {
-        if (compound_data[i] == 0xAA)  // Check if any byte equals 0xAA
-        {
-            return 1;  // Found 0xAA, return 1
-        }
-    }
-    return 0;  // If no 0xAA is found, return 0
+	return checksum;
+}
+
+UINT8 usb_check_valid_packet(UINT8 *compound_data, UINT8 len)
+{
+	/* 注意：接收到的数据compound_data[0]是固定的，0x00，这一位不考虑；实际判断从compound_data[1]开始考虑 */
+
+	/* 协议格式是 帧头（1 byte）+ 长度（1 byte）(计算的是从帧头到校验和的长度（包括）) + OPCODE (1 byte) + DATA（不固定） + Checksum (1 byte) */
+	/* 例如：0xAA 0x04 0x01 0x0A  */
+	/* 帧头是0xAA，长度是0x04，OPCODE是0x01，没有DATA，checksum是0XAA + 0x04 + 0x01 = 0xB0 */
+	/* 判断缓冲区接收到的数据是否是一个合法的数据包 */
+
+	/* 判断流程：1. 判断compound_data[1]是否是一个合法的帧头0xAA */
+	/* 			2. 如果是一个合法的帧头，紧接着从compound_data[2]提取这个字节的长度 */
+	/* 			3. 根据协议格式计算得到checksum是位于compound_data[x]的x是多少 */
+	/* 			4. 再计算这包数据的checksum，与协议里面的checksum大小是否一致：如果一直，那就进入判断OPCODE的环节 */
+
+	UINT8 expected_checksum = 0;
+	UINT8 recved_checksum = 0;
+	UINT8 length = 0;
+
+	if (compound_data[1] != 0xAA)
+	{
+		return 0;
+	}
+
+	length = compound_data[2];
+
+	expected_checksum = usb_calculate_checksum(compound_data, length);
+	recved_checksum = compound_data[length];
+	if (expected_checksum != recved_checksum)
+	{
+		return 0;
+	}
+
+	return 1;
+
+}
+
+
+// UINT8 usb_check_heartbeat_packet(UINT8 *compound_data, UINT8 len)
+// {
+
+// 	UINT8 i = 0;
+// 	if (compound_data[0] == 0x00 && compound_data[1] == 0x01)
+// 	{
+// 		;
+// 	}
+
+	// UINT8 i;
+    // // Iterate through the data buffer
+    // for (i = 0; i < len; i++)
+    // {
+    //     if (compound_data[i] == 0xAA)  // Check if any byte equals 0xAA
+    //     {
+    //         return 1;  // Found 0xAA, return 1
+    //     }
+    // }
+    // return 0;  // If no 0xAA is found, return 0
 //    UINT8 checksum = 0;
 //    UINT8 i;
 //    
@@ -833,53 +899,197 @@ UINT8 usb_check_heartbeat_packet(UINT8 *compound_data, UINT8 len)
 //        return 0;
 //    }
 //    return 1;
-}
+// }
 
+/**
+ * @brief 
+ * 
+ * @param len 
+ */
 void compound_process_recv_data(UINT8 len)
 {
-    UINT8 checksum = 0;
-    UINT8 i;  /* 移到函数开始处声明 */
-    
+	/* 响应数据包格式 */
+	/* compound_response_data[0] =  0x01 						1byte												*/
+	/* compound_response_data[1] =  PACKET_HEADER 				1byte											    */
+	/* compound_response_data[2] =  LENGTH 						1byte												*/
+	/* compound_response_data[3] =  OPCODE 						1byte												*/
+	/* compound_response_data[4] =  ERROCDE 					1byte												*/
+	/* compound_response_data[5 ~ x] =  DATA 				    不固定，根据OPCODE不同，DATA内容不同			      */
+	/* compound_response_data[x + 1] =  CHECKSUM 				1byte												*/
 
-	
-    if (usb_check_heartbeat_packet(compound_received_data, len))
-    {
-		g_compound_heartbeat_timer = 0;
-		g_compound_heartbeat_flag = 1;
+	if (usb_check_valid_packet(compound_received_data, len))	// 合法数据包
+	{
+		// 数据包合法，继续处理
+		UINT8 opcode = compound_received_data[3];
 
-        compound_response_data[0] = PACKET_HEADER;
-        compound_response_data[1] = PACKET_OPCODE_HEART;
-        compound_response_data[2] = VERSION_STR[0];
-        compound_response_data[3] = VERSION_STR[2];
-        compound_response_data[4] = VERSION_STR[4];
-        compound_response_data[5] = DEVICE_VID_L;           
-        compound_response_data[6] = DEVICE_VID_H;           
-        compound_response_data[7] = DEVICE_PID_L;           
-        compound_response_data[8] = DEVICE_PID_H;           
-        
-        for(i = 0; i < 9; i++) 
-        {
-            checksum += compound_response_data[i];
-        }
-        compound_response_data[9] = checksum;
-        
-        memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 10);  
-        UEP2_T_LEN = 10;
-        UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-        
-        if (!first_hb_flag)
-        {
-            first_hb_flag = 1;
-            timer0_register_cb(led_flash_handler);
-        }
-    }
-    else
-    {
+		switch (opcode)
+		{
+			case USB_OP_HEARTBEAT:
+			{
+				// 心跳包:心跳包的组装的data是
+				//VERSION_STR[0];
+    			//VERSION_STR[2];
+    			//VERSION_STR[4];
+    			//DEVICE_VID_L;           
+    			//DEVICE_VID_H;           
+    			//DEVICE_PID_L;           
+    			//DEVICE_PID_H;
+				// ERRCODE = 0x00
+
+				// 1. 业务逻辑，处理心跳包功能
+
+				UINT8 checksum = 0;
+				UINT8 length =  12;
+				UINT8 i = 0;
+
+				g_compound_heartbeat_timer = 0;
+				g_compound_heartbeat_flag = 1;
+				if (!first_hb_flag)
+				{
+					first_hb_flag = 1;
+					timer0_register_cb(led_flash_handler);
+				}
+
+				// 2. 组装响应包并发送
+				compound_response_data[0] = 0x01;		// 协议固定的，第一个字节得是0x01
+				compound_response_data[1] = PACKET_HEADER;
+				compound_response_data[2] = length;
+				compound_response_data[3] = opcode;
+				compound_response_data[4] = 0x00;	// ERRCODE = 0x00
+
+				compound_response_data[5] = VERSION_STR[0];
+				compound_response_data[6] = VERSION_STR[2];
+				compound_response_data[7] = VERSION_STR[4];
+				compound_response_data[8] = DEVICE_VID_L;
+				compound_response_data[9] = DEVICE_VID_H;
+				compound_response_data[10] = DEVICE_PID_L;
+				compound_response_data[11] = DEVICE_PID_H;
+
+				// 计算校验和，计算[1] ~ [11]的校验和
+				for (i = 1; i < 12; i++)
+				{
+					checksum += compound_response_data[i];
+				}
+				compound_response_data[12] = checksum;
+
+				// 填充剩余的字节为0x00，直到64字节
+				memset(&compound_response_data[13], 0, 51);  // 64 - 13 = 51
+
+				// 发送数据
+				memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
+        		UEP2_T_LEN = 64;
+        		UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+
+				break;
+			}
+			case USB_OP_WL_LEARNMATCH:
+			{
+				// 学习匹配
+				// 学习匹配没有data
+				// ERRCODE = 0x00
+
+				// 1. 业务逻辑，学习匹配无线按键控制USB键盘
+				
+				break;
+			}
+			case USB_OP_WL_CLEANMATCH:
+			{
+				// 清空匹配
+				// 清空匹配没有data
+				// ERRCODE = 0x00
+				break;
+			}
+
+			default:
+			{
+				// 未知的OPCODE, 需要回复错误码
+				// 未知的OPCODE的data是空的
+				// ERRCODE = 0x01
+				break;
+			}
+
+		}
+
+	}
+	else	// 非法数据包 echo模式
+	{
         memcpy(compound_response_data, compound_received_data, len);
         memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, len);
         UEP2_T_LEN = len;
         UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-    }
+	}
+
+    // UINT8 checksum = 0;
+    // UINT8 i;  /* 移到函数开始处声明 */
+    
+
+	
+    // if (usb_check_heartbeat_packet(compound_received_data, len))
+    // {
+	// 	g_compound_heartbeat_timer = 0;
+	// 	g_compound_heartbeat_flag = 1;
+
+    //     // compound_response_data[0] = PACKET_HEADER;
+    //     // compound_response_data[1] = PACKET_OPCODE_HEART;
+    //     // compound_response_data[2] = VERSION_STR[0];
+    //     // compound_response_data[3] = VERSION_STR[2];
+    //     // compound_response_data[4] = VERSION_STR[4];
+    //     // compound_response_data[5] = DEVICE_VID_L;           
+    //     // compound_response_data[6] = DEVICE_VID_H;           
+    //     // compound_response_data[7] = DEVICE_PID_L;           
+    //     // compound_response_data[8] = DEVICE_PID_H;           
+        
+    //     // for(i = 0; i < 9; i++) 
+    //     // {
+    //     //     checksum += compound_response_data[i];
+    //     // }
+    //     // compound_response_data[9] = checksum;
+        
+    //     // memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 10);  
+    //     // UEP2_T_LEN = 10;
+    //     // UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+        
+    //     // if (!first_hb_flag)
+    //     // {
+    //     //     first_hb_flag = 1;
+    //     //     timer0_register_cb(led_flash_handler);
+    //     // }
+	// 	compound_response_data[0] = 0x01;
+	// 	compound_response_data[1] = PACKET_HEADER;
+    //     compound_response_data[2] = PACKET_OPCODE_HEART;
+    //     compound_response_data[3] = VERSION_STR[0];
+    //     compound_response_data[4] = VERSION_STR[2];
+    //     compound_response_data[5] = VERSION_STR[4];
+    //     compound_response_data[6] = DEVICE_VID_L;           
+    //     compound_response_data[7] = DEVICE_VID_H;           
+    //     compound_response_data[8] = DEVICE_PID_L;           
+    //     compound_response_data[9] = DEVICE_PID_H;           
+        
+    //     for(i = 1; i < 10; i++) 
+    //     {
+    //         checksum += compound_response_data[i];
+    //     }
+    //     compound_response_data[10] = checksum;
+    //     // 填充剩余的字节为0x00，直到64字节
+    //     memset(&compound_response_data[11], 0, 53);  // 64 - 11 = 53 
+
+    //     memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
+    //     UEP2_T_LEN = 64;
+    //     UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+        
+    //     if (!first_hb_flag)
+    //     {
+    //         first_hb_flag = 1;
+    //         timer0_register_cb(led_flash_handler);
+    //     }
+    // }
+    // else
+    // {
+    //     memcpy(compound_response_data, compound_received_data, len);
+    //     memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, len);
+    //     UEP2_T_LEN = len;
+    //     UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+    // }
 }
 
 
