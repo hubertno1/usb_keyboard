@@ -60,13 +60,13 @@ void handle_key_event(key_event_t event)
   {
       case KEY_EVENT_PRESSED:
       {
-          usb_send_key("P");
+          usb_send_key("#");
           break;
       }
 
       case KEY_EVENT_RELEASED:
       {
-          usb_send_key("R");
+          usb_send_key("#");
           break;
       }
       

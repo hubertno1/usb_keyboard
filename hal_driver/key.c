@@ -1,6 +1,6 @@
 #include "key.h"
-#include "CH554.H"
-#include "debug.h"
+#include 	".\Public\CH554.H"
+#include 	".\Public\debug.h"
 
 typedef enum {
     KEY_STATE_IDLE,
@@ -11,13 +11,27 @@ typedef enum {
 
 static key_cb_t key_cb = NULL;
 static key_state_t key_state = KEY_STATE_IDLE;
+static key_mode_t key_mode;
 // static uint32_t debounce_time = 0;
 
 void key_init(void)
 {
     /* 0000 0001 << 4  ->  0001 0000 */ 
-    P1_MOD_OC |= (1 << 4); // Set P1.4 as open-drain
-    P1_DIR_PU |= (1 << 4); // Set P1.4 as input
+    P1_MOD_OC |= (1 << 7); // Set P1.4 as open-drain
+    P1_DIR_PU |= (1 << 7); // Set P1.4 as input
+
+    P1_MOD_OC |= (1 << 1);  // Set P1.7 as open-drain
+    P1_DIR_PU |= (1 << 1);  // Set P1.7 as input
+
+    if (MODE_PIN == 0)
+    {
+        key_mode = KEY_MODE_EDGE;
+    }
+    else
+    {
+        key_mode = KEY_MODE_RISING;
+    }
+
 }
 
 void register_key_cb(key_cb_t cb)
@@ -44,7 +58,11 @@ static key_event_t get_key_event(void)
             if (KEY == 0)
             {
                 key_state = KEY_STATE_PRESSED;
-                event = KEY_EVENT_PRESSED;
+
+                if (key_mode == KEY_MODE_EDGE)
+                {
+                    event = KEY_EVENT_PRESSED;
+                }
             }
             else
             {
@@ -72,6 +90,7 @@ static key_event_t get_key_event(void)
             {
                 key_state = KEY_STATE_PRESSED;
             }
+            break;
         }
 
         default:
@@ -91,4 +110,3 @@ void key_scan(void)
     if (evt != KEY_EVENT_NONE && key_cb != NULL)
         key_cb(evt);
 }
-

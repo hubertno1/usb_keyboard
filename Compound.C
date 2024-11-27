@@ -730,6 +730,11 @@ void usb_send_key (char *p)
 		else
 		{
 		switch ( c ){
+			case '#':			/* f7 key */
+				HIDKey[0] = 0x00;
+				HIDKey[2] = 0x40;
+				break;
+
 			case '`' :
 				HIDKey[0] = 0X08;
 				HIDKey[2] = 0X15;
@@ -798,7 +803,7 @@ UINT8 usb_check_heartbeat_packet(UINT8 *compound_data, UINT8 len)
     // Iterate through the data buffer
     for (i = 0; i < len; i++)
     {
-        if (compound_data[i] == 0x41)  // Check if any byte equals 0xAA
+        if (compound_data[i] == 0xAA)  // Check if any byte equals 0xAA
         {
             return 1;  // Found 0xAA, return 1
         }
@@ -835,6 +840,8 @@ void compound_process_recv_data(UINT8 len)
     UINT8 checksum = 0;
     UINT8 i;  /* 移到函数开始处声明 */
     
+
+	
     if (usb_check_heartbeat_packet(compound_received_data, len))
     {
 		g_compound_heartbeat_timer = 0;
