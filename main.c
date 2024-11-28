@@ -13,10 +13,13 @@
 #include    "key.h"
 #include    "Timer.H"
 
-sbit LED1 = P3^2;
+sbit LED1 = P1^6;
 
 extern UINT8 	FLAG;												  // Trans complete flag
-extern UINT8 	EnumOK;												// Enum ok flag					
+extern UINT8 	EnumOK;												// Enum ok flag
+
+void wdog_init(void);
+
 
 void soft_reset(void)
 {
@@ -51,7 +54,6 @@ void led_flash_handler(void)
         soft_reset();
     } 
 
-
 }
 
 void handle_key_event(key_event_t event)
@@ -61,12 +63,24 @@ void handle_key_event(key_event_t event)
       case KEY_EVENT_PRESSED:
       {
           usb_send_key("#");
+		    	LED1 = 0;
+				mDelaymS(20);
+				LED1 = 1;
+				mDelaymS(20);
+
+
           break;
       }
 
       case KEY_EVENT_RELEASED:
       {
           usb_send_key("#");
+		  		    	LED1 = 0;
+				mDelaymS(20);
+				LED1 = 1;
+				mDelaymS(20);
+
+
           break;
       }
       
@@ -88,7 +102,7 @@ void main(void)
   UINT8 i = 0;
 
   CfgFsys();                                //Configure sys
-  mDelaymS(5);                              //
+  mDelaymS(100);                              //
   mInitSTDIO( );                            // Init UART0
 
 #if	DE_PRINTF
@@ -102,12 +116,12 @@ void main(void)
   UEP2_T_LEN = 0;                                                  
   FLAG = 0;
 	EnumOK = 0;
-
   key_init();
   register_key_cb(handle_key_event);
 
   timer0_init_10ms();
   // timer0_register_cb(led_flash_handler);
+  wdog_init();             // 初始化看门狗
 
 
   while(1)
@@ -125,8 +139,23 @@ void main(void)
           key_scan();
       }
       
+        WDOG_COUNT = 0x6F;  // 重置看门狗计数器以防止超时复位
+
       mDelaymS(10);
   }
+}
+
+void wdog_init(void)
+{
+    // 启用安全模式，写寄存器使能
+    SAFE_MOD = 0x55; // 进入安全模式
+    SAFE_MOD = 0xAA;
+
+    // 设置 WDOG_COUNT 初始值
+    WDOG_COUNT = 0x19;  // 设置为约 10 秒的计数值 (主频 12MHz)
+
+    // 使能看门狗
+    GLOBAL_CFG |= bWDOG_EN;  // 允许看门狗复位
 }
 
 /**************************** END *************************************/

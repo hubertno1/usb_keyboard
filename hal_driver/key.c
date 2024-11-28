@@ -20,12 +20,17 @@ void key_init(void)
     P1_MOD_OC |= (1 << 7); // Set P1.4 as open-drain
     P1_DIR_PU |= (1 << 7); // Set P1.4 as input
 
+
     P1_MOD_OC |= (1 << 1);  // Set P1.7 as open-drain
     P1_DIR_PU |= (1 << 1);  // Set P1.7 as input
+
+	mDelaymS(30);
+	
 
     if (MODE_PIN == 0)
     {
         key_mode = KEY_MODE_EDGE;
+		key_state = KEY_STATE_PRESSED;
     }
     else
     {

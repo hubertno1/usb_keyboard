@@ -19,6 +19,8 @@ typedef void (*key_cb_t)(key_event_t event);
 sbit KEY = P1^7;
 sbit MODE_PIN = P1^1;
 
+sbit WL_LEARN_PIN = P1^6;
+
 
 void key_init(void);
 void key_scan(void);

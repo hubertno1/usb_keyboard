@@ -76,6 +76,15 @@ UINT8 usb_check_heartbeat_packet(UINT8 *compound_data, UINT8 len);
 volatile UINT8 g_compound_heartbeat_flag = 0;
 volatile UINT8 g_compound_heartbeat_timer = 0;
 
+// 定义学习状态
+
+volatile learnmatch_state_t learnmatch_state = LEARNMATCH_STATE_IDLE;
+volatile UINT16 g_learnmatch_timer = 0;	// 计时器，单位为10ms
+volatile cleanmatch_state_t cleanmatch_state = CLEANMATCH_STATE_IDLE;
+volatile UINT16 g_cleanmatch_timer = 0;	// 计时器，单位为10ms
+
+
+
 /**************************** Device Descriptor *************************************/
 UINT8C DevDesc[18] = {																// Device Descriptor
 	0x12,0x01,
@@ -989,7 +998,42 @@ void compound_process_recv_data(UINT8 len)
 				// ERRCODE = 0x00
 
 				// 1. 业务逻辑，学习匹配无线按键控制USB键盘
-				
+				// 拉低P1^6 4s，进入学习模式，然后拉高
+				// 首先考虑阻塞可不可以。如果阻塞4s，那么久不能处理其他的数据包，这会直接导致心跳包的处理失败，进而重启USB设备，这是不允许的
+				// 所以，必须使用非阻塞方法。想法是利用原有的定时器，原来的定时器是定时10ms，那就是可以在这个主程序里面注册回调函数，然后在回调函数里面定时4s，然后就是主程序里4s后主程序里来一个全局变量置位，
+				// 上位机下发学习命令，状态机接收到，立刻回复usb主机开始处理学习，然后进入学习状态：拉低P1.6 4s，然后拉高；这个怎么通过非阻塞的方法实现呢？
+
+				UINT8 checksum = 0;
+				UINT8 length = 5;	// header + length + opcode + ERRCODE + checksum
+				UINT8 i = 0;
+
+
+				if (learnmatch_state == LEARNMATCH_STATE_IDLE)
+				{
+					P1^6 = 0;
+					learnmatch_state = LEARNMATCH_STATE_ACTIVE;
+					g_learnmatch_timer = 0;
+				}
+
+				// 2. 组装响应包并发送
+				compound_response_data[0] = 0x01;		// 协议固定的，第一个字节得是0x01
+				compound_response_data[1] = PACKET_HEADER;
+				compound_response_data[2] = length;
+				compound_response_data[3] = opcode;
+				compound_response_data[4] = 0x00;	// ERRCODE = 0x00,表示成功
+
+				for (i = 1; i < 5; i++)
+				{
+					checksum += compound_response_data[i];
+				}
+				compound_response_data[5] = checksum;
+				memset(&compound_response_data[6], 0, 58);  // 64 - 6 = 58
+
+				// 发送数据
+				memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
+				UEP2_T_LEN = 64;
+				UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+
 				break;
 			}
 			case USB_OP_WL_CLEANMATCH:
@@ -997,6 +1041,38 @@ void compound_process_recv_data(UINT8 len)
 				// 清空匹配
 				// 清空匹配没有data
 				// ERRCODE = 0x00
+				// 清空匹配和学习匹配的区别是，清空匹配是拉低11s，然后拉高
+				UINT8 checksum = 0;
+				UINT8 length = 5;	// header + length + opcode + ERRCODE + checksum
+				UINT8 i = 0;
+
+
+				if (cleanmatch_state == CLEANMATCH_STATE_IDLE)
+				{
+					P1^6 = 0;
+					cleanmatch_state = CLEANMATCH_STATE_ACTIVE;
+					g_cleanmatch_timer = 0;
+				}
+
+				// 2. 组装响应包并发送
+				compound_response_data[0] = 0x01;		// 协议固定的，第一个字节得是0x01
+				compound_response_data[1] = PACKET_HEADER;
+				compound_response_data[2] = length;
+				compound_response_data[3] = opcode;
+				compound_response_data[4] = 0x00;	// ERRCODE = 0x00,表示成功
+
+				for (i = 1; i < 5; i++)
+				{
+					checksum += compound_response_data[i];
+				}
+				compound_response_data[5] = checksum;
+				memset(&compound_response_data[6], 0, 58);  // 64 - 6 = 58
+
+				// 发送数据
+				memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
+				UEP2_T_LEN = 64;
+				UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+
 				break;
 			}
 

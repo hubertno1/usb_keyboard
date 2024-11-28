@@ -11,6 +11,8 @@
 #include ".\Public\Debug.H"
 #include "Timer.H" 
 #include "stdio.h"
+#include "compound.h"
+
 
 #pragma  NOAREGS
 
@@ -186,5 +188,26 @@ void mTimer0Interrupt(void) interrupt INT_NO_TMR0 using 1
     {
         timer0_cb();
     }
+
+    if (learnmatch_state == LEARNMATCH_STATE_ACTIVE)
+    {
+        if (++ g_learnmatch_timer >= 400)
+        {
+            P1^6 = 1;
+            learnmatch_state = LEARNMATCH_STATE_IDLE;
+            g_learnmatch_timer = 0;
+        }
+    }
+
+    if (cleanmatch_state == CLEANMATCH_STATE_ACTIVE)
+    {
+        if (++ g_cleanmatch_timer >= 1100)
+        {
+            P1^6 = 1;
+            cleanmatch_state = CLEANMATCH_STATE_IDLE;
+            g_cleanmatch_timer = 0;
+        }
+    }
 }
+
 #endif
