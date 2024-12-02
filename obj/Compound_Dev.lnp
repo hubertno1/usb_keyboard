@@ -1,0 +1,8 @@
+".\obj\Compound.obj",
+".\obj\main.obj",
+".\obj\DEBUG.obj",
+".\obj\key.obj",
+".\obj\Timer.obj" 
+TO ".\obj\Compound_Dev" 
+PRINT(".\list\Compound_Dev.m51") RAMSIZE(256) 
+DISABLEWARNING (16) 
