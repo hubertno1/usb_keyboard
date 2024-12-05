@@ -61,7 +61,7 @@ volatile UINT8 g_data_len;
 #define USB_OP_HEARTBEAT 			0x10
 #define USB_OP_WL_LEARNMATCH 		0x1F
 #define USB_OP_WL_CLEANMATCH		0X20
-
+#define USB_OP_WR_KEYVALUE 			0X2F
 
 #define VERSION_STR 				"1.0.0"
 #define DEVICE_VID_L     0x31    // VID低字节
@@ -85,7 +85,7 @@ volatile UINT16 g_learnmatch_timer = 0;	// 计时器，单位为10ms
 volatile cleanmatch_state_t cleanmatch_state = CLEANMATCH_STATE_IDLE;
 volatile UINT16 g_cleanmatch_timer = 0;	// 计时器，单位为10ms
 
-
+sbit LED1 = P3^2;
 
 
 /**************************** Device Descriptor *************************************/
@@ -436,14 +436,20 @@ void DeviceInterrupt( void ) interrupt INT_NO_USB using 1                      	
 									{
 										case 0x82:
 											UEP2_CTRL = UEP2_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;/* Endpoint 2 IN STALL */
+											//timer0_register_cb(led_flash_handler);
+										 
 											break;
 
 										case 0x02:
 											UEP2_CTRL = UEP2_CTRL & (~bUEP_R_TOG) | UEP_R_RES_STALL;/* Endpoint 2 OUT STALL */
+											//timer0_register_cb(led_flash_handler);
+										 
 											break;
 
 										case 0x81:
 											UEP1_CTRL = UEP1_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;/* Endpoint 1 IN STALL */
+											//timer0_register_cb(led_flash_handler);
+										 
 											break;
 
 										default:
@@ -732,6 +738,8 @@ void usb_send_key (char *p)
 {
 
 	char c = *p;
+	
+  memset(HIDKey, 0, sizeof(HIDKey)); 
 		
 	if( (c >= 'a') && (c <= 'z' )){
 		c = c - 'a' + 'A';
@@ -954,13 +962,13 @@ void compound_process_recv_data(UINT8 len)
 				UINT8 length =  12;
 				UINT8 i = 0;
 
-				g_compound_heartbeat_timer = 0;
+//				g_compound_heartbeat_timer = 0;
 				g_compound_heartbeat_flag = 1;
-				if (!first_hb_flag)
-				{
-					first_hb_flag = 1;
-					timer0_register_cb(led_flash_handler);
-				}
+//				if (!first_hb_flag)
+//				{
+//					first_hb_flag = 1;
+//					timer0_register_cb(led_flash_handler);
+//				}
 
 				// 2. 组装响应包并发送
 				compound_response_data[0] = 0x01;		// 协议固定的，第一个字节得是0x01

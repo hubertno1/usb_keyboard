@@ -1,1 +1,0 @@
-"hal_driver\Timer.C" LARGE OPTIMIZE (6,SPEED) BROWSE INCDIR(.\hal_driver) DEBUG OBJECTEXTEND PRINT(.\list\Timer.lst) TABS (2) OBJECT(.\obj\Timer.obj)

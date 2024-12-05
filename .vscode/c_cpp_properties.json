@@ -3,11 +3,10 @@
         {
             "name": "Target 1",
             "includePath": [
+                "c:\\Users\\Libiao\\Desktop\\USB_KEYBOARD\\Compound_Dev - sendkey\\hal_driver",
                 "D:\\installations\\keil\\C51\\INC",
-                "c:\\Users\\Libiao\\Desktop\\nanoCH55x-master\\nanoCH55x-master\\examples\\沁恒USB单片机CH55X实用参考例程代码\\Compound_Dev - sendkey",
-                "c:\\Users\\Libiao\\Desktop\\nanoCH55x-master\\nanoCH55x-master\\examples\\沁恒USB单片机CH55X实用参考例程代码\\Compound_Dev - sendkey\\Touch_Key",
-                "c:\\Users\\Libiao\\Desktop\\nanoCH55x-master\\nanoCH55x-master\\examples\\沁恒USB单片机CH55X实用参考例程代码\\Compound_Dev - sendkey\\Public",
-                "${workspaceFolder}/hal_driver"
+                "c:\\Users\\Libiao\\Desktop\\USB_KEYBOARD\\Compound_Dev - sendkey",
+                "c:\\Users\\Libiao\\Desktop\\USB_KEYBOARD\\Compound_Dev - sendkey\\Public"
             ],
             "defines": [
                 "__C51__",

@@ -30,7 +30,7 @@ typedef enum {
 
 extern volatile UINT8 g_data_ready;
 extern volatile UINT8 g_data_len;
-extern volatile UINT8 g_compound_heartbeat_flag;
+//extern volatile UINT8 g_compound_heartbeat_flag;
 extern volatile UINT8 g_compound_heartbeat_timer;
 extern volatile UINT16 g_learnmatch_timer;
 extern volatile UINT16 g_cleanmatch_timer;

@@ -32,6 +32,7 @@ void key_init(void)
     }
     else
     {
+				KEY = 1;
         key_mode = KEY_MODE_RISING;
     }
 

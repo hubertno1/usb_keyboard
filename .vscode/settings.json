@@ -2,6 +2,7 @@
     "files.associations": {
         "Compound.C": "cpp",
         "Touch_Key.C": "cpp",
-        "DEBUG.C": "cpp"
+        "DEBUG.C": "cpp",
+        "Timer.C": "cpp"
     }
 }

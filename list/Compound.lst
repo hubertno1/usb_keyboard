@@ -1,4 +1,4 @@
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 1   
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 1   
 
 
 C51 COMPILER V9.54, COMPILATION OF MODULE COMPOUND
@@ -62,7 +62,7 @@ line level    source
   48          USB_SETUP_REQ             SetupReqBuf;                                    // A buffer for Setup package.
   49          
   50          char code sPath[] = "`  C:\\HID_RECV.EXE   \r   ";                    // The path for the software. SPACE for delay
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 2   
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 2   
 
   51          char *pStr = sPath;
   52          
@@ -101,7 +101,7 @@ line level    source
   85          volatile cleanmatch_state_t cleanmatch_state = CLEANMATCH_STATE_IDLE;
   86          volatile UINT16 g_cleanmatch_timer = 0; // ¼ÆÊ±Æ÷£¬µ¥Î»Îª10ms
   87          
-  88          
+  88          sbit LED1 = P3^2;
   89          
   90          
   91          /**************************** Device Descriptor *************************************/
@@ -126,7 +126,7 @@ line level    source
  110            0xa1, 0x01,     // Collation Application
  111            0x05, 0x07,     // Usafe page (key code)
  112            0x19, 0xe0,     // Usage Min ( E0 -->  L_CTL)
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 3   
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 3   
 
  113            0x29, 0xe7,     // Usage MAX ( E7 --> R_GUI )
  114            0x15, 0x00,     // Logical min
@@ -190,7 +190,7 @@ line level    source
  172          //   0x09,0x02,0x29,0x00,0x01,0x01,0x00,0xA0,0x32,                        // Configure Descriptor 
  173          //    0x09,0x04,0x00,0x00,0x02,0x03,0x00,0x00,0x00,                         // Interface Descriptor, Composite d
              -evice£¬ 2 EPs
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 4   
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 4   
 
  174            0x09,0x04,0x01,0x00,0x02,0x03,0x00,0x00,0x00,                         // Interface Descriptor, Composite device
              -£¬ 2 EPs
@@ -254,7 +254,7 @@ line level    source
  222          {     
  223   1          memcpy( Ep1Buffer, HIDKey, sizeof(HIDKey));                                   // Upload data
  224   1          UEP1_T_LEN = sizeof(HIDKey);                                                  // Upload length
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 5   
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 5   
 
  225   1          UEP1_CTRL = UEP1_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_ACK;                     // Return ACK
  226   1          while(( UEP1_CTRL & MASK_UEP_T_RES ) == UEP_T_RES_ACK);                       // Waiting upload complete
@@ -318,7 +318,7 @@ line level    source
  281   3            UEP1_T_LEN = 0;                                                         // Reset length
  282   3                  UEP1_CTRL = UEP1_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_NAK;               // Default return NAK
  283   3                  FLAG = 1;                                                               // Upload complete flag
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 6   
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 6   
 
  284   3                  break;                                                                       
  285   3              case UIS_TOKEN_SETUP | 0:                                                   // SETUP packet
@@ -382,7 +382,7 @@ line level    source
  339   7                      else
  340   7                      {
  341   8                        len = 0xff;                                         // Add interface index, if required
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 7   
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 7   
 
  342   8                      }
  343   7      //              if( UsbSetupBuf->wIndexL == 0 )                         // Interface index 1 HID report --> Compos
@@ -446,7 +446,7 @@ line level    source
  399   8                         UEP1_CTRL = UEP1_CTRL & ~ (bUEP_R_TOG | MASK_UEP_R_RES) | UEP_R_RES_ACK;
  400   8                         break;
  401   8                      default:
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 8   
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 8   
 
  402   8                         len = 0xFF;                                          // Error endpoint
  403   8                         break;
@@ -485,801 +485,809 @@ line level    source
  436   8                        {
  437   9                          case 0x82:
  438   9                            UEP2_CTRL = UEP2_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;/* Endpoint 2 IN STALL */
- 439   9                            break;
- 440   9      
- 441   9                          case 0x02:
- 442   9                            UEP2_CTRL = UEP2_CTRL & (~bUEP_R_TOG) | UEP_R_RES_STALL;/* Endpoint 2 OUT STALL */
- 443   9                            break;
- 444   9      
- 445   9                          case 0x81:
- 446   9                            UEP1_CTRL = UEP1_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;/* Endpoint 1 IN STALL */
+ 439   9                            //timer0_register_cb(led_flash_handler);
+ 440   9                           
+ 441   9                            break;
+ 442   9      
+ 443   9                          case 0x02:
+ 444   9                            UEP2_CTRL = UEP2_CTRL & (~bUEP_R_TOG) | UEP_R_RES_STALL;/* Endpoint 2 OUT STALL */
+ 445   9                            //timer0_register_cb(led_flash_handler);
+ 446   9                           
  447   9                            break;
  448   9      
- 449   9                          default:
- 450   9                            len = 0xFF;                                     // Error routing
- 451   9                            break;
- 452   9                        }
- 453   8                      }
- 454   7                      else
- 455   7                      {
- 456   8                        len = 0xFF;                                         // Error routing
- 457   8                      }
- 458   7                    }
- 459   6                    else
- 460   6                    {
- 461   7                      len = 0xFF;                                             // Error routing
- 462   7                    }
- 463   6                    break;
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 9   
+ 449   9                          case 0x81:
+ 450   9                            UEP1_CTRL = UEP1_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;/* Endpoint 1 IN STALL */
+ 451   9                            //timer0_register_cb(led_flash_handler);
+ 452   9                           
+ 453   9                            break;
+ 454   9      
+ 455   9                          default:
+ 456   9                            len = 0xFF;                                     // Error routing
+ 457   9                            break;
+ 458   9                        }
+ 459   8                      }
+ 460   7                      else
+ 461   7                      {
+ 462   8                        len = 0xFF;                                         // Error routing
+ 463   8                      }
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 9   
 
- 464   6                case USB_GET_STATUS:                          // Get status
- 465   6                   Ep0Buffer[0] = 0x00;
- 466   6                   Ep0Buffer[1] = 0x00;
- 467   6                   if ( SetupLen >= 2 )
- 468   6                   {
- 469   7                    len = 2;
- 470   7                   }
- 471   6                   else
- 472   6                   {
- 473   7                    len = SetupLen;
- 474   7                   }
- 475   6                   break;
- 476   6                default:
- 477   6                  len = 0xff;                                                       // Error routing
- 478   6                  break;
- 479   6                }
- 480   5              }
- 481   4                  }
- 482   3                  else
- 483   3                  {
- 484   4                      len = 0xff;                                                             //Packet length erro
+ 464   7                    }
+ 465   6                    else
+ 466   6                    {
+ 467   7                      len = 0xFF;                                             // Error routing
+ 468   7                    }
+ 469   6                    break;
+ 470   6                case USB_GET_STATUS:                          // Get status
+ 471   6                   Ep0Buffer[0] = 0x00;
+ 472   6                   Ep0Buffer[1] = 0x00;
+ 473   6                   if ( SetupLen >= 2 )
+ 474   6                   {
+ 475   7                    len = 2;
+ 476   7                   }
+ 477   6                   else
+ 478   6                   {
+ 479   7                    len = SetupLen;
+ 480   7                   }
+ 481   6                   break;
+ 482   6                default:
+ 483   6                  len = 0xff;                                                       // Error routing
+ 484   6                  break;
+ 485   6                }
+ 486   5              }
+ 487   4                  }
+ 488   3                  else
+ 489   3                  {
+ 490   4                      len = 0xff;                                                             //Packet length erro
              -r
- 485   4                  }
- 486   3                  if(len == 0xff)
- 487   3                  {
- 488   4                      SetupReq = 0xFF;
- 489   4       //               UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_STALL | UEP_T_RES_STALL;  // Control endp
-             -oint should not return STALL, 
- 490   4                                                    // if Send STALL, that means the device has no ability to communicate with the host
  491   4                  }
- 492   3                  else if(len <= 8)                                                           // Upload the data o
+ 492   3                  if(len == 0xff)
+ 493   3                  {
+ 494   4                      SetupReq = 0xFF;
+ 495   4       //               UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_STALL | UEP_T_RES_STALL;  // Control endp
+             -oint should not return STALL, 
+ 496   4                                                    // if Send STALL, that means the device has no ability to communicate with the host
+ 497   4                  }
+ 498   3                  else if(len <= 8)                                                           // Upload the data o
              -r return the 0 data packet
- 493   3                  {   
- 494   4                      UEP0_T_LEN = len;   
- 495   4                      UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_ACK | UEP_T_RES_ACK;    // Default data pack
+ 499   3                  {   
+ 500   4                      UEP0_T_LEN = len;   
+ 501   4                      UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_ACK | UEP_T_RES_ACK;    // Default data pack
              -et is DATA1, and return ACK
- 496   4                  }   
- 497   3                  else    
- 498   3                  {   
- 499   4                      UEP0_T_LEN = 0;                               // Upload 0 data packet, incase the host go to status stag
+ 502   4                  }   
+ 503   3                  else    
+ 504   3                  {   
+ 505   4                      UEP0_T_LEN = 0;                               // Upload 0 data packet, incase the host go to status stag
              -e ahead, and get fault code
- 500   4                      UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_ACK | UEP_T_RES_ACK;    // Default data pack
+ 506   4                      UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_ACK | UEP_T_RES_ACK;    // Default data pack
              -et is DATA1, and return ACK
- 501   4                  }   
- 502   3                  break;    
- 503   3              case UIS_TOKEN_IN | 0:                                                          // Endpoint 0 IN
- 504   3                  switch(SetupReq)
- 505   3                  {
- 506   4                  case USB_GET_DESCRIPTOR:
- 507   4                      len = SetupLen >= 8 ? 8 : SetupLen;                                     // Current length
- 508   4                      memcpy( Ep0Buffer, pDescr, len );                                       // Upload the data
- 509   4                      SetupLen -= len;
- 510   4                      pDescr += len;
- 511   4                      UEP0_T_LEN = len;
- 512   4                      UEP0_CTRL ^= bUEP_T_TOG;                                                //Toggle Sysc flag 
- 513   4                      break;
- 514   4                  case USB_SET_ADDRESS:
- 515   4                      USB_DEV_AD = USB_DEV_AD & bUDA_GP_BIT | SetupLen;
- 516   4                      UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;
- 517   4                      break;
- 518   4                  default:
- 519   4      //                UEP0_T_LEN = 0;                                                         //Status stage com
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 10  
+ 507   4                  }   
+ 508   3                  break;    
+ 509   3              case UIS_TOKEN_IN | 0:                                                          // Endpoint 0 IN
+ 510   3                  switch(SetupReq)
+ 511   3                  {
+ 512   4                  case USB_GET_DESCRIPTOR:
+ 513   4                      len = SetupLen >= 8 ? 8 : SetupLen;                                     // Current length
+ 514   4                      memcpy( Ep0Buffer, pDescr, len );                                       // Upload the data
+ 515   4                      SetupLen -= len;
+ 516   4                      pDescr += len;
+ 517   4                      UEP0_T_LEN = len;
+ 518   4                      UEP0_CTRL ^= bUEP_T_TOG;                                                //Toggle Sysc flag 
+ 519   4                      break;
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 10  
 
+ 520   4                  case USB_SET_ADDRESS:
+ 521   4                      USB_DEV_AD = USB_DEV_AD & bUDA_GP_BIT | SetupLen;
+ 522   4                      UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;
+ 523   4                      break;
+ 524   4                  default:
+ 525   4      //                UEP0_T_LEN = 0;                                                         //Status stage com
              -plete, upload 0 data packet, end the control trans
- 520   4      //                UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;    
- 521   4                      break;
- 522   4                  }
- 523   3            if(len == 0xff)
- 524   3            {
- 525   4              UEP0_T_LEN = 0;                                                         //Status stage complete, upload 
+ 526   4      //                UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;    
+ 527   4                      break;
+ 528   4                  }
+ 529   3            if(len == 0xff)
+ 530   3            {
+ 531   4              UEP0_T_LEN = 0;                                                         //Status stage complete, upload 
              -0 data packet, end the control trans
- 526   4                      UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;    
- 527   4            }
- 528   3                  break;
- 529   3              case UIS_TOKEN_OUT | 0:                               // Endpoint 0 OUT
- 530   3                  len = USB_RX_LEN;
- 531   3                  if( SetupReq == 0x09 )
- 532   3                  {
- 533   4                      if( Ep0Buffer[0] )
- 534   4                      {
- 535   5      #if DE_PRINTF
-                                  printf("Light on Num Lock LED!\n");
-              #endif
- 538   5                      }
- 539   4                      else if( Ep0Buffer[0] == 0)
+ 532   4                      UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;    
+ 533   4            }
+ 534   3                  break;
+ 535   3              case UIS_TOKEN_OUT | 0:                               // Endpoint 0 OUT
+ 536   3                  len = USB_RX_LEN;
+ 537   3                  if( SetupReq == 0x09 )
+ 538   3                  {
+ 539   4                      if( Ep0Buffer[0] )
  540   4                      {
  541   5      #if DE_PRINTF
-                                  printf("Light off Num Lock LED!\n");
+                                  printf("Light on Num Lock LED!\n");
               #endif
  544   5                      }
- 545   4                  }
- 546   3                  UEP0_T_LEN = 0;                                 // Upload 0 data packet, incase the host go to status stage a
+ 545   4                      else if( Ep0Buffer[0] == 0)
+ 546   4                      {
+ 547   5      #if DE_PRINTF
+                                  printf("Light off Num Lock LED!\n");
+              #endif
+ 550   5                      }
+ 551   4                  }
+ 552   3                  UEP0_T_LEN = 0;                                 // Upload 0 data packet, incase the host go to status stage a
              -head, and get fault code
- 547   3                  UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_ACK;                    // Default data packet is DATA1, and retur
+ 553   3                  UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_ACK;                    // Default data packet is DATA1, and retur
              -n ACK
- 548   3                  break;
- 549   3              default:
- 550   3                  break;
- 551   3              }
- 552   2              UIF_TRANSFER = 0;                                                               // Reset the trans i
+ 554   3                  break;
+ 555   3              default:
+ 556   3                  break;
+ 557   3              }
+ 558   2              UIF_TRANSFER = 0;                                                               // Reset the trans i
              -nterrupt
- 553   2          }
- 554   1          if( UIF_BUS_RST )                                                                   // Device mode Bus 
+ 559   2          }
+ 560   1          if( UIF_BUS_RST )                                                                   // Device mode Bus 
              -reset
- 555   1          {
- 556   2              UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;
- 557   2              UEP1_CTRL = bUEP_AUTO_TOG | UEP_R_RES_ACK;
- 558   2              UEP2_CTRL = bUEP_AUTO_TOG | UEP_R_RES_ACK | UEP_T_RES_NAK;
- 559   2              USB_DEV_AD = 0x00;
- 560   2              UIF_SUSPEND = 0;
- 561   2              UIF_TRANSFER = 0;
- 562   2              UIF_BUS_RST = 0;                                                                // Reset Reset inter
+ 561   1          {
+ 562   2              UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;
+ 563   2              UEP1_CTRL = bUEP_AUTO_TOG | UEP_R_RES_ACK;
+ 564   2              UEP2_CTRL = bUEP_AUTO_TOG | UEP_R_RES_ACK | UEP_T_RES_NAK;
+ 565   2              USB_DEV_AD = 0x00;
+ 566   2              UIF_SUSPEND = 0;
+ 567   2              UIF_TRANSFER = 0;
+ 568   2              UIF_BUS_RST = 0;                                                                // Reset Reset inter
              -rupt
- 563   2          }   
- 564   1          if( UIF_SUSPEND )                                                                   // USB Suspended and
+ 569   2          }   
+ 570   1          if( UIF_SUSPEND )                                                                   // USB Suspended and
              - Awake interrupt
- 565   1          {   
- 566   2              UIF_SUSPEND = 0;    
- 567   2              if ( USB_MIS_ST & bUMS_SUSPEND )                                                // Suspended
- 568   2              {   
- 569   3      #ifdef DEBUG    
+ 571   1          {   
+ 572   2              UIF_SUSPEND = 0;    
+ 573   2              if ( USB_MIS_ST & bUMS_SUSPEND )                                                // Suspended
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 11  
+
+ 574   2              {   
+ 575   3      #ifdef DEBUG    
                           printf( "Enter LPM\r\n" );                                                  // Enter LPM flag fo
              -r debug
               #endif
- 572   3                  while ( XBUS_AUX & bUART0_TX )
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 11  
-
- 573   3                  {
- 574   4            
- 575   4                      ;                                       // Waiting send complete ...
- 576   4                  }   
- 577   3                  SAFE_MOD = 0x55;    
- 578   3                  SAFE_MOD = 0xAA;    
- 579   3                  WAKE_CTRL = bWAK_BY_USB | bWAK_RXD0_LO;                                     // Action on USB Bus,
+ 578   3                  while ( XBUS_AUX & bUART0_TX )
+ 579   3                  {
+ 580   4            
+ 581   4                      ;                                       // Waiting send complete ...
+ 582   4                  }   
+ 583   3                  SAFE_MOD = 0x55;    
+ 584   3                  SAFE_MOD = 0xAA;    
+ 585   3                  WAKE_CTRL = bWAK_BY_USB | bWAK_RXD0_LO;                                     // Action on USB Bus,
              - or RXD0, will awake the device
- 580   3                  PCON |= PD;                                                                 // LPM
- 581   3                  SAFE_MOD = 0x55;    
- 582   3                  SAFE_MOD = 0xAA;    
- 583   3                  WAKE_CTRL = 0x00;   
- 584   3              }   
- 585   2          }   
- 586   1          else {                                                                              // Unexpected interr
+ 586   3                  PCON |= PD;                                                                 // LPM
+ 587   3                  SAFE_MOD = 0x55;    
+ 588   3                  SAFE_MOD = 0xAA;    
+ 589   3                  WAKE_CTRL = 0x00;   
+ 590   3              }   
+ 591   2          }   
+ 592   1          else {                                                                              // Unexpected interr
              -upt
- 587   2              USB_INT_FG = 0xFF;                                                              // Reset the interru
+ 593   2              USB_INT_FG = 0xFF;                                                              // Reset the interru
              -pt
- 588   2          }
- 589   1      }
- 590          
- 591          /*******************************************************************************
- 592          * Function Name  : static SendKey( char *p)
- 593          * Description    : ASCII to key code
- 594          * Input          : char *p
- 595          * Output         : None
- 596          * Return         : None
- 597          *******************************************************************************/
- 598          
- 599          static void SendKey ( char *p )
- 600          {
- 601   1      
- 602   1        char c = *p;
- 603   1          
- 604   1        if( (c >= 'a') && (c <= 'z' )){
- 605   2          c = c - 'a' + 'A';
- 606   2        }
- 607   1        
- 608   1        if( (c >= 'A') && (c <= 'Z' )){
- 609   2          HIDKey[2] = c - 'A' + 4;
- 610   2        }
- 611   1        else
- 612   1          if( c >= '1' && c <= '9' )
- 613   1            HIDKey[2] = c - '1' + 0X1E;
- 614   1          else
- 615   1          {
- 616   2          switch ( c ){
- 617   3            case '`' :
- 618   3              HIDKey[0] = 0X08;
- 619   3              HIDKey[2] = 0X15;
- 620   3              break;
- 621   3            case '\\':
- 622   3              HIDKey[2] = 0x31;
- 623   3              break;
- 624   3            case ' ':
- 625   3              HIDKey[2] = L_SHIFT;
+ 594   2          }
+ 595   1      }
+ 596          
+ 597          /*******************************************************************************
+ 598          * Function Name  : static SendKey( char *p)
+ 599          * Description    : ASCII to key code
+ 600          * Input          : char *p
+ 601          * Output         : None
+ 602          * Return         : None
+ 603          *******************************************************************************/
+ 604          
+ 605          static void SendKey ( char *p )
+ 606          {
+ 607   1      
+ 608   1        char c = *p;
+ 609   1          
+ 610   1        if( (c >= 'a') && (c <= 'z' )){
+ 611   2          c = c - 'a' + 'A';
+ 612   2        }
+ 613   1        
+ 614   1        if( (c >= 'A') && (c <= 'Z' )){
+ 615   2          HIDKey[2] = c - 'A' + 4;
+ 616   2        }
+ 617   1        else
+ 618   1          if( c >= '1' && c <= '9' )
+ 619   1            HIDKey[2] = c - '1' + 0X1E;
+ 620   1          else
+ 621   1          {
+ 622   2          switch ( c ){
+ 623   3            case '`' :
+ 624   3              HIDKey[0] = 0X08;
+ 625   3              HIDKey[2] = 0X15;
  626   3              break;
- 627   3            case '\r':
- 628   3              HIDKey[2] = ENTER;
+ 627   3            case '\\':
+ 628   3              HIDKey[2] = 0x31;
  629   3              break;
- 630   3            case ':':
- 631   3              HIDKey[0] = 0x02;
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 12  
+ 630   3            case ' ':
+ 631   3              HIDKey[2] = L_SHIFT;
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 12  
 
- 632   3              HIDKey[2] = 0x33;
- 633   3              break;
- 634   3            case '+':
- 635   3              HIDKey[0] = 0x000;
- 636   3              HIDKey[2] = 0x57;
- 637   3              break;
- 638   3            case '_':
- 639   3              HIDKey[0] = 0X02;
- 640   3              HIDKey[2] = 0X2D;
- 641   3              break;
- 642   3            case '/':
- 643   3              HIDKey[0] = L_CTL + L_ALT;
- 644   3              HIDKey[2] = 0X16;
- 645   3              break;
- 646   3            case '0':
- 647   3              HIDKey[2] = 0X27;
- 648   3              break;
- 649   3            case '.':
- 650   3              HIDKey[2] = 0X37;
+ 632   3              break;
+ 633   3            case '\r':
+ 634   3              HIDKey[2] = ENTER;
+ 635   3              break;
+ 636   3            case ':':
+ 637   3              HIDKey[0] = 0x02;
+ 638   3              HIDKey[2] = 0x33;
+ 639   3              break;
+ 640   3            case '+':
+ 641   3              HIDKey[0] = 0x000;
+ 642   3              HIDKey[2] = 0x57;
+ 643   3              break;
+ 644   3            case '_':
+ 645   3              HIDKey[0] = 0X02;
+ 646   3              HIDKey[2] = 0X2D;
+ 647   3              break;
+ 648   3            case '/':
+ 649   3              HIDKey[0] = L_CTL + L_ALT;
+ 650   3              HIDKey[2] = 0X16;
  651   3              break;
- 652   3            case '~':
- 653   3              HIDKey[0] = L_ALT;
- 654   3              HIDKey[2] = 0X05;
- 655   3              break;
- 656   3            case '!':
- 657   3              HIDKey[0] = L_ALT;
- 658   3              HIDKey[2] = 0X08;
- 659   3              break;
- 660   3            default:
+ 652   3            case '0':
+ 653   3              HIDKey[2] = 0X27;
+ 654   3              break;
+ 655   3            case '.':
+ 656   3              HIDKey[2] = 0X37;
+ 657   3              break;
+ 658   3            case '~':
+ 659   3              HIDKey[0] = L_ALT;
+ 660   3              HIDKey[2] = 0X05;
  661   3              break;
- 662   3          }
- 663   2        }
- 664   1        
- 665   1        mDelaymS( 20 );                                       //emulate the press down and pop up
- 666   1        while(FLAG == 0);                                                           // Upload the key
- 667   1        Enp1IntIn();            
- 668   1        while(FLAG == 0);                                             
- 669   1        mDelaymS( 20 );
- 670   1        HIDKey[0] = 0X00;                 
- 671   1        HIDKey[2] = 0X00;                                                             // Reset the key
- 672   1        while(FLAG == 0);                                                       
- 673   1        Enp1IntIn();      
- 674   1        while(FLAG == 0); 
- 675   1      }
- 676          
- 677          /*******************************************************************************
- 678          * Function Name  : static void UploadData(void)
- 679          * Description    : Upload the HID code
- 680          * Input          : None
- 681          * Output         : None
- 682          * Return         : None
- 683          *******************************************************************************/
- 684          static void UploadData(void)
- 685          {
- 686   1        UINT8 i;
- 687   1        for( i = 1; i < 64 ;i ++ )
- 688   1          HIDCom[i] += rand();
- 689   1      }
- 690          /*******************************************************************************
- 691          * Function Name  : extern HIDValueHandle( void )
- 692          * Description    : Upload the HID code
- 693          * Input          : None
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 13  
+ 662   3            case '!':
+ 663   3              HIDKey[0] = L_ALT;
+ 664   3              HIDKey[2] = 0X08;
+ 665   3              break;
+ 666   3            default:
+ 667   3              break;
+ 668   3          }
+ 669   2        }
+ 670   1        
+ 671   1        mDelaymS( 20 );                                       //emulate the press down and pop up
+ 672   1        while(FLAG == 0);                                                           // Upload the key
+ 673   1        Enp1IntIn();            
+ 674   1        while(FLAG == 0);                                             
+ 675   1        mDelaymS( 20 );
+ 676   1        HIDKey[0] = 0X00;                 
+ 677   1        HIDKey[2] = 0X00;                                                             // Reset the key
+ 678   1        while(FLAG == 0);                                                       
+ 679   1        Enp1IntIn();      
+ 680   1        while(FLAG == 0); 
+ 681   1      }
+ 682          
+ 683          /*******************************************************************************
+ 684          * Function Name  : static void UploadData(void)
+ 685          * Description    : Upload the HID code
+ 686          * Input          : None
+ 687          * Output         : None
+ 688          * Return         : None
+ 689          *******************************************************************************/
+ 690          static void UploadData(void)
+ 691          {
+ 692   1        UINT8 i;
+ 693   1        for( i = 1; i < 64 ;i ++ )
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 13  
 
- 694          * Output         : None
- 695          * Return         : None
- 696          *******************************************************************************/
- 697          extern void HIDValueHandle( void )
- 698          {
- 699   1        static UINT8 rotateFlag = 0;                                // When upload keys complete, upload EP2 data
- 700   1        UINT16 KeyData = TouchKeyButton;
- 701   1        if(TKEY_CTRL&bTKC_IF)                                       //query key
- 702   1        {
- 703   2           KeyData = TKEY_DAT;                                      //
- 704   2      #ifdef DE_PRINTF
- 705   2           printf("B.=  %04x\n",KeyData&0x7FFF);    
- 706   2      #endif
- 707   2        }   
- 708   1        if (rotateFlag &&(KeyData < (TouchKeyButton-100)))          //100 ÁéÃô¶Èµ÷½Ú          
- 709   1        {
- 710   2          HIDCom[0] += 0x01;  
- 711   2          UploadData();
- 712   2      
- 713   2          Enp2IntIn();  
- 714   2        }     
- 715   1        else if(rotateFlag == 0)
- 716   1        {       
- 717   2              SendKey(pStr);                                         // Upload path
- 718   2          pStr++; 
- 719   2          if(*pStr == '\0')     
- 720   2          {
- 721   3            SendKey( "~" );                                      // Upload ALT+B
- 722   3            mDelaymS( 200 );  
- 723   3            rotateFlag = 1;
- 724   3          }   
- 725   2        } 
- 726   1      
- 727   1      }
- 728          
- 729          /**************************** END *************************************/
- 730          
- 731          void usb_send_key (char *p)
- 732          {
- 733   1      
- 734   1        char c = *p;
- 735   1          
- 736   1        if( (c >= 'a') && (c <= 'z' )){
- 737   2          c = c - 'a' + 'A';
- 738   2        }
- 739   1        
- 740   1        if( (c >= 'A') && (c <= 'Z' )){
- 741   2          HIDKey[2] = c - 'A' + 4;
- 742   2        }
- 743   1        else
- 744   1          if( c >= '1' && c <= '9' )
- 745   1            HIDKey[2] = c - '1' + 0X1E;
- 746   1          else
- 747   1          {
- 748   2          switch ( c ){
- 749   3            case '#':     /* f7 key */
- 750   3              HIDKey[0] = 0x00;
- 751   3              HIDKey[2] = 0x40;
- 752   3              break;
- 753   3      
- 754   3            case '`' :
- 755   3              HIDKey[0] = 0X08;
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 14  
+ 694   1          HIDCom[i] += rand();
+ 695   1      }
+ 696          /*******************************************************************************
+ 697          * Function Name  : extern HIDValueHandle( void )
+ 698          * Description    : Upload the HID code
+ 699          * Input          : None
+ 700          * Output         : None
+ 701          * Return         : None
+ 702          *******************************************************************************/
+ 703          extern void HIDValueHandle( void )
+ 704          {
+ 705   1        static UINT8 rotateFlag = 0;                                // When upload keys complete, upload EP2 data
+ 706   1        UINT16 KeyData = TouchKeyButton;
+ 707   1        if(TKEY_CTRL&bTKC_IF)                                       //query key
+ 708   1        {
+ 709   2           KeyData = TKEY_DAT;                                      //
+ 710   2      #ifdef DE_PRINTF
+ 711   2           printf("B.=  %04x\n",KeyData&0x7FFF);    
+ 712   2      #endif
+ 713   2        }   
+ 714   1        if (rotateFlag &&(KeyData < (TouchKeyButton-100)))          //100 ÁéÃô¶Èµ÷½Ú          
+ 715   1        {
+ 716   2          HIDCom[0] += 0x01;  
+ 717   2          UploadData();
+ 718   2      
+ 719   2          Enp2IntIn();  
+ 720   2        }     
+ 721   1        else if(rotateFlag == 0)
+ 722   1        {       
+ 723   2              SendKey(pStr);                                         // Upload path
+ 724   2          pStr++; 
+ 725   2          if(*pStr == '\0')     
+ 726   2          {
+ 727   3            SendKey( "~" );                                      // Upload ALT+B
+ 728   3            mDelaymS( 200 );  
+ 729   3            rotateFlag = 1;
+ 730   3          }   
+ 731   2        } 
+ 732   1      
+ 733   1      }
+ 734          
+ 735          /**************************** END *************************************/
+ 736          
+ 737          void usb_send_key (char *p)
+ 738          {
+ 739   1      
+ 740   1        char c = *p;
+ 741   1        
+ 742   1        memset(HIDKey, 0, sizeof(HIDKey)); 
+ 743   1          
+ 744   1        if( (c >= 'a') && (c <= 'z' )){
+ 745   2          c = c - 'a' + 'A';
+ 746   2        }
+ 747   1        
+ 748   1        if( (c >= 'A') && (c <= 'Z' )){
+ 749   2          HIDKey[2] = c - 'A' + 4;
+ 750   2        }
+ 751   1        else
+ 752   1          if( c >= '1' && c <= '9' )
+ 753   1            HIDKey[2] = c - '1' + 0X1E;
+ 754   1          else
+ 755   1          {
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 14  
 
- 756   3              HIDKey[2] = 0X15;
- 757   3              break;
- 758   3            case '\\':
- 759   3              HIDKey[2] = 0x31;
+ 756   2          switch ( c ){
+ 757   3            case '#':     /* f7 key */
+ 758   3              HIDKey[0] = 0x00;
+ 759   3              HIDKey[2] = 0x40;
  760   3              break;
- 761   3            case ' ':
- 762   3              HIDKey[2] = L_SHIFT;
- 763   3              break;
- 764   3            case '\r':
- 765   3              HIDKey[2] = ENTER;
- 766   3              break;
- 767   3            case ':':
- 768   3              HIDKey[0] = 0x02;
- 769   3              HIDKey[2] = 0x33;
- 770   3              break;
- 771   3            case '+':
- 772   3              HIDKey[0] = 0x000;
- 773   3              HIDKey[2] = 0x57;
+ 761   3      
+ 762   3            case '`' :
+ 763   3              HIDKey[0] = 0X08;
+ 764   3              HIDKey[2] = 0X15;
+ 765   3              break;
+ 766   3            case '\\':
+ 767   3              HIDKey[2] = 0x31;
+ 768   3              break;
+ 769   3            case ' ':
+ 770   3              HIDKey[2] = L_SHIFT;
+ 771   3              break;
+ 772   3            case '\r':
+ 773   3              HIDKey[2] = ENTER;
  774   3              break;
- 775   3            case '_':
- 776   3              HIDKey[0] = 0X02;
- 777   3              HIDKey[2] = 0X2D;
+ 775   3            case ':':
+ 776   3              HIDKey[0] = 0x02;
+ 777   3              HIDKey[2] = 0x33;
  778   3              break;
- 779   3            case '/':
- 780   3              HIDKey[0] = L_CTL + L_ALT;
- 781   3              HIDKey[2] = 0X16;
+ 779   3            case '+':
+ 780   3              HIDKey[0] = 0x000;
+ 781   3              HIDKey[2] = 0x57;
  782   3              break;
- 783   3            case '0':
- 784   3              HIDKey[2] = 0X27;
- 785   3              break;
- 786   3            case '.':
- 787   3              HIDKey[2] = 0X37;
- 788   3              break;
- 789   3            case '~':
- 790   3              HIDKey[0] = L_ALT;
- 791   3              HIDKey[2] = 0X05;
- 792   3              break;
- 793   3            case '!':
- 794   3              HIDKey[0] = L_ALT;
- 795   3              HIDKey[2] = 0X08;
+ 783   3            case '_':
+ 784   3              HIDKey[0] = 0X02;
+ 785   3              HIDKey[2] = 0X2D;
+ 786   3              break;
+ 787   3            case '/':
+ 788   3              HIDKey[0] = L_CTL + L_ALT;
+ 789   3              HIDKey[2] = 0X16;
+ 790   3              break;
+ 791   3            case '0':
+ 792   3              HIDKey[2] = 0X27;
+ 793   3              break;
+ 794   3            case '.':
+ 795   3              HIDKey[2] = 0X37;
  796   3              break;
- 797   3            default:
- 798   3              break;
- 799   3          }
- 800   2        }
- 801   1        
- 802   1        mDelaymS( 20 );                                       //emulate the press down and pop up
- 803   1        while(FLAG == 0);                                                           // Upload the key
- 804   1        Enp1IntIn();            
- 805   1        while(FLAG == 0);                                             
- 806   1        mDelaymS( 20 );
- 807   1        HIDKey[0] = 0X00;                 
- 808   1        HIDKey[2] = 0X00;                                                             // Reset the key
- 809   1        while(FLAG == 0);                                                       
- 810   1        Enp1IntIn();      
- 811   1        while(FLAG == 0); 
- 812   1      }
- 813          
- 814          /**
- 815           * @brief ¼ÆËã´Ócompound_data[1]¿ªÊ¼µÄlen - 1¸ö×Ö½ÚµÄÐ£ÑéºÍ
- 816           * 
- 817           * @param compound_data 
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 15  
+ 797   3            case '~':
+ 798   3              HIDKey[0] = L_ALT;
+ 799   3              HIDKey[2] = 0X05;
+ 800   3              break;
+ 801   3            case '!':
+ 802   3              HIDKey[0] = L_ALT;
+ 803   3              HIDKey[2] = 0X08;
+ 804   3              break;
+ 805   3            default:
+ 806   3              break;
+ 807   3          }
+ 808   2        }
+ 809   1        
+ 810   1        mDelaymS( 20 );                                       //emulate the press down and pop up
+ 811   1        while(FLAG == 0);                                                           // Upload the key
+ 812   1        Enp1IntIn();            
+ 813   1        while(FLAG == 0);                                             
+ 814   1        mDelaymS( 20 );
+ 815   1        HIDKey[0] = 0X00;                 
+ 816   1        HIDKey[2] = 0X00;                                                             // Reset the key
+ 817   1        while(FLAG == 0);                                                       
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 15  
 
- 818           * @param len ÕâÀïµÄlenÖ¸µÄÊÇ´Ócompound_data[2]ÖÐÌáÈ¡µÄ³¤¶ÈÖµ
- 819           * @return UINT8 
- 820           */
- 821          UINT8 usb_calculate_checksum(UINT8 *compound_data, UINT8 len)
- 822          {
- 823   1        UINT8 checksum = 0;
- 824   1        UINT8 i;
- 825   1      
- 826   1        for (i = 1; i < len; i++)
- 827   1        {
- 828   2          checksum += compound_data[i];
- 829   2        }
- 830   1      
- 831   1        return checksum;
- 832   1      }
- 833          
- 834          UINT8 usb_check_valid_packet(UINT8 *compound_data, UINT8 len)
- 835          {
- 836   1        /* ×¢Òâ£º½ÓÊÕµ½µÄÊý¾Ýcompound_data[0]ÊÇ¹Ì¶¨µÄ£¬0x00£¬ÕâÒ»Î»²»¿¼ÂÇ£»Êµ¼ÊÅÐ¶Ï´Ócompound_data[1]¿ªÊ¼¿¼ÂÇ */
- 837   1      
- 838   1        /* Ð­Òé¸ñÊ½ÊÇ Ö¡Í·£¨1 byte£©+ ³¤¶È£¨1 byte£©(¼ÆËãµÄÊÇ´ÓÖ¡Í·µ½Ð£ÑéºÍµÄ³¤¶È£¨°üÀ¨£©) + OPCODE (1 byte) + DA
+ 818   1        Enp1IntIn();      
+ 819   1        while(FLAG == 0); 
+ 820   1      }
+ 821          
+ 822          /**
+ 823           * @brief ¼ÆËã´Ócompound_data[1]¿ªÊ¼µÄlen - 1¸ö×Ö½ÚµÄÐ£ÑéºÍ
+ 824           * 
+ 825           * @param compound_data 
+ 826           * @param len ÕâÀïµÄlenÖ¸µÄÊÇ´Ócompound_data[2]ÖÐÌáÈ¡µÄ³¤¶ÈÖµ
+ 827           * @return UINT8 
+ 828           */
+ 829          UINT8 usb_calculate_checksum(UINT8 *compound_data, UINT8 len)
+ 830          {
+ 831   1        UINT8 checksum = 0;
+ 832   1        UINT8 i;
+ 833   1      
+ 834   1        for (i = 1; i < len; i++)
+ 835   1        {
+ 836   2          checksum += compound_data[i];
+ 837   2        }
+ 838   1      
+ 839   1        return checksum;
+ 840   1      }
+ 841          
+ 842          UINT8 usb_check_valid_packet(UINT8 *compound_data, UINT8 len)
+ 843          {
+ 844   1        /* ×¢Òâ£º½ÓÊÕµ½µÄÊý¾Ýcompound_data[0]ÊÇ¹Ì¶¨µÄ£¬0x00£¬ÕâÒ»Î»²»¿¼ÂÇ£»Êµ¼ÊÅÐ¶Ï´Ócompound_data[1]¿ªÊ¼¿¼ÂÇ */
+ 845   1      
+ 846   1        /* Ð­Òé¸ñÊ½ÊÇ Ö¡Í·£¨1 byte£©+ ³¤¶È£¨1 byte£©(¼ÆËãµÄÊÇ´ÓÖ¡Í·µ½Ð£ÑéºÍµÄ³¤¶È£¨°üÀ¨£©) + OPCODE (1 byte) + DA
              -TA£¨²»¹Ì¶¨£© + Checksum (1 byte) */
- 839   1        /* ÀýÈç£º0xAA 0x04 0x01 0x0A  */
- 840   1        /* Ö¡Í·ÊÇ0xAA£¬³¤¶ÈÊÇ0x04£¬OPCODEÊÇ0x01£¬Ã»ÓÐDATA£¬checksumÊÇ0XAA + 0x04 + 0x01 = 0xB0 */
- 841   1        /* ÅÐ¶Ï»º³åÇø½ÓÊÕµ½µÄÊý¾ÝÊÇ·ñÊÇÒ»¸öºÏ·¨µÄÊý¾Ý°ü */
- 842   1      
- 843   1        /* ÅÐ¶ÏÁ÷³Ì£º1. ÅÐ¶Ïcompound_data[1]ÊÇ·ñÊÇÒ»¸öºÏ·¨µÄÖ¡Í·0xAA */
- 844   1        /*      2. Èç¹ûÊÇÒ»¸öºÏ·¨µÄÖ¡Í·£¬½ô½Ó×Å´Ócompound_data[2]ÌáÈ¡Õâ¸ö×Ö½ÚµÄ³¤¶È */
- 845   1        /*      3. ¸ù¾ÝÐ­Òé¸ñÊ½¼ÆËãµÃµ½checksumÊÇÎ»ÓÚcompound_data[x]µÄxÊÇ¶àÉÙ */
- 846   1        /*      4. ÔÙ¼ÆËãÕâ°üÊý¾ÝµÄchecksum£¬ÓëÐ­ÒéÀïÃæµÄchecksum´óÐ¡ÊÇ·ñÒ»ÖÂ£ºÈç¹ûÒ»Ö±£¬ÄÇ¾Í½øÈëÅÐ¶ÏOPCODEµÄ»·½Ú *
+ 847   1        /* ÀýÈç£º0xAA 0x04 0x01 0x0A  */
+ 848   1        /* Ö¡Í·ÊÇ0xAA£¬³¤¶ÈÊÇ0x04£¬OPCODEÊÇ0x01£¬Ã»ÓÐDATA£¬checksumÊÇ0XAA + 0x04 + 0x01 = 0xB0 */
+ 849   1        /* ÅÐ¶Ï»º³åÇø½ÓÊÕµ½µÄÊý¾ÝÊÇ·ñÊÇÒ»¸öºÏ·¨µÄÊý¾Ý°ü */
+ 850   1      
+ 851   1        /* ÅÐ¶ÏÁ÷³Ì£º1. ÅÐ¶Ïcompound_data[1]ÊÇ·ñÊÇÒ»¸öºÏ·¨µÄÖ¡Í·0xAA */
+ 852   1        /*      2. Èç¹ûÊÇÒ»¸öºÏ·¨µÄÖ¡Í·£¬½ô½Ó×Å´Ócompound_data[2]ÌáÈ¡Õâ¸ö×Ö½ÚµÄ³¤¶È */
+ 853   1        /*      3. ¸ù¾ÝÐ­Òé¸ñÊ½¼ÆËãµÃµ½checksumÊÇÎ»ÓÚcompound_data[x]µÄxÊÇ¶àÉÙ */
+ 854   1        /*      4. ÔÙ¼ÆËãÕâ°üÊý¾ÝµÄchecksum£¬ÓëÐ­ÒéÀïÃæµÄchecksum´óÐ¡ÊÇ·ñÒ»ÖÂ£ºÈç¹ûÒ»Ö±£¬ÄÇ¾Í½øÈëÅÐ¶ÏOPCODEµÄ»·½Ú *
              -/
- 847   1      
- 848   1        UINT8 expected_checksum = 0;
- 849   1        UINT8 recved_checksum = 0;
- 850   1        UINT8 length = 0;
- 851   1      
- 852   1        if (compound_data[1] != 0xAA)
- 853   1        {
- 854   2          return 0;
- 855   2        }
- 856   1      
- 857   1        length = compound_data[2];
- 858   1      
- 859   1        expected_checksum = usb_calculate_checksum(compound_data, length);
- 860   1        recved_checksum = compound_data[length];
- 861   1        if (expected_checksum != recved_checksum)
- 862   1        {
- 863   2          return 0;
- 864   2        }
- 865   1      
- 866   1        return 1;
- 867   1      
- 868   1      }
-*** WARNING C280 IN LINE 834 OF Compound.C: 'len': unreferenced local variable
- 869          
- 870          
- 871          // UINT8 usb_check_heartbeat_packet(UINT8 *compound_data, UINT8 len)
- 872          // {
- 873          
- 874          //  UINT8 i = 0;
- 875          //  if (compound_data[0] == 0x00 && compound_data[1] == 0x01)
- 876          //  {
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 16  
+ 855   1      
+ 856   1        UINT8 expected_checksum = 0;
+ 857   1        UINT8 recved_checksum = 0;
+ 858   1        UINT8 length = 0;
+ 859   1      
+ 860   1        if (compound_data[1] != 0xAA)
+ 861   1        {
+ 862   2          return 0;
+ 863   2        }
+ 864   1      
+ 865   1        length = compound_data[2];
+ 866   1      
+ 867   1        expected_checksum = usb_calculate_checksum(compound_data, length);
+ 868   1        recved_checksum = compound_data[length];
+ 869   1        if (expected_checksum != recved_checksum)
+ 870   1        {
+ 871   2          return 0;
+ 872   2        }
+ 873   1      
+ 874   1        return 1;
+ 875   1      
+ 876   1      }
+*** WARNING C280 IN LINE 842 OF Compound.C: 'len': unreferenced local variable
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 16  
 
- 877          //    ;
- 878          //  }
- 879          
- 880            // UINT8 i;
- 881              // // Iterate through the data buffer
- 882              // for (i = 0; i < len; i++)
- 883              // {
- 884              //     if (compound_data[i] == 0xAA)  // Check if any byte equals 0xAA
- 885              //     {
- 886              //         return 1;  // Found 0xAA, return 1
- 887              //     }
- 888              // }
- 889              // return 0;  // If no 0xAA is found, return 0
- 890          //    UINT8 checksum = 0;
- 891          //    UINT8 i;
- 892          //    
- 893          //    if (len != 10)
- 894          //    {
- 895          //        return 0;
- 896          //    }
- 897          //    if (compound_data[0] != PACKET_HEADER)
- 898          //    {
- 899          //        return 0;
- 900          //    }
- 901          //    if (compound_data[1] != PACKET_OPCODE_HEART)
+ 877          
+ 878          
+ 879          // UINT8 usb_check_heartbeat_packet(UINT8 *compound_data, UINT8 len)
+ 880          // {
+ 881          
+ 882          //  UINT8 i = 0;
+ 883          //  if (compound_data[0] == 0x00 && compound_data[1] == 0x01)
+ 884          //  {
+ 885          //    ;
+ 886          //  }
+ 887          
+ 888            // UINT8 i;
+ 889              // // Iterate through the data buffer
+ 890              // for (i = 0; i < len; i++)
+ 891              // {
+ 892              //     if (compound_data[i] == 0xAA)  // Check if any byte equals 0xAA
+ 893              //     {
+ 894              //         return 1;  // Found 0xAA, return 1
+ 895              //     }
+ 896              // }
+ 897              // return 0;  // If no 0xAA is found, return 0
+ 898          //    UINT8 checksum = 0;
+ 899          //    UINT8 i;
+ 900          //    
+ 901          //    if (len != 10)
  902          //    {
  903          //        return 0;
  904          //    }
- 905          //    for (i = 0; i < len - 1; i++)
+ 905          //    if (compound_data[0] != PACKET_HEADER)
  906          //    {
- 907          //        checksum += compound_data[i];
+ 907          //        return 0;
  908          //    }
- 909          //    if (checksum != compound_data[len - 1])
+ 909          //    if (compound_data[1] != PACKET_OPCODE_HEART)
  910          //    {
  911          //        return 0;
  912          //    }
- 913          //    return 1;
- 914          // }
- 915          
- 916          /**
- 917           * @brief 
- 918           * 
- 919           * @param len 
- 920           */
- 921          void compound_process_recv_data(UINT8 len)
- 922          {
- 923   1        /* ÏìÓ¦Êý¾Ý°ü¸ñÊ½ */
- 924   1        /* compound_response_data[0] =  0x01            1byte                       */
- 925   1        /* compound_response_data[1] =  PACKET_HEADER         1byte                         */
- 926   1        /* compound_response_data[2] =  LENGTH            1byte                       */
- 927   1        /* compound_response_data[3] =  OPCODE            1byte                       */
- 928   1        /* compound_response_data[4] =  ERROCDE           1byte                       */
- 929   1        /* compound_response_data[5 ~ x] =  DATA            ²»¹Ì¶¨£¬¸ù¾ÝOPCODE²»Í¬£¬DATAÄÚÈÝ²»Í¬            */
- 930   1        /* compound_response_data[x + 1] =  CHECKSUM        1byte                       */
- 931   1      
- 932   1        if (usb_check_valid_packet(compound_received_data, len))  // ºÏ·¨Êý¾Ý°ü
- 933   1        {
- 934   2          // Êý¾Ý°üºÏ·¨£¬¼ÌÐø´¦Àí
- 935   2          UINT8 opcode = compound_received_data[3];
- 936   2      
- 937   2          switch (opcode)
- 938   2          {
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 17  
+ 913          //    for (i = 0; i < len - 1; i++)
+ 914          //    {
+ 915          //        checksum += compound_data[i];
+ 916          //    }
+ 917          //    if (checksum != compound_data[len - 1])
+ 918          //    {
+ 919          //        return 0;
+ 920          //    }
+ 921          //    return 1;
+ 922          // }
+ 923          
+ 924          /**
+ 925           * @brief 
+ 926           * 
+ 927           * @param len 
+ 928           */
+ 929          void compound_process_recv_data(UINT8 len)
+ 930          {
+ 931   1        /* ÏìÓ¦Êý¾Ý°ü¸ñÊ½ */
+ 932   1        /* compound_response_data[0] =  0x01            1byte                       */
+ 933   1        /* compound_response_data[1] =  PACKET_HEADER         1byte                         */
+ 934   1        /* compound_response_data[2] =  LENGTH            1byte                       */
+ 935   1        /* compound_response_data[3] =  OPCODE            1byte                       */
+ 936   1        /* compound_response_data[4] =  ERROCDE           1byte                       */
+ 937   1        /* compound_response_data[5 ~ x] =  DATA            ²»¹Ì¶¨£¬¸ù¾ÝOPCODE²»Í¬£¬DATAÄÚÈÝ²»Í¬            */
+ 938   1        /* compound_response_data[x + 1] =  CHECKSUM        1byte                       */
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 17  
 
- 939   3            case USB_OP_HEARTBEAT:
- 940   3            {
- 941   4              // ÐÄÌø°ü:ÐÄÌø°üµÄ×é×°µÄdataÊÇ
- 942   4              //VERSION_STR[0];
- 943   4                //VERSION_STR[2];
- 944   4                //VERSION_STR[4];
- 945   4                //DEVICE_VID_L;           
- 946   4                //DEVICE_VID_H;           
- 947   4                //DEVICE_PID_L;           
- 948   4                //DEVICE_PID_H;
- 949   4              // ERRCODE = 0x00
- 950   4      
- 951   4              // 1. ÒµÎñÂß¼­£¬´¦ÀíÐÄÌø°ü¹¦ÄÜ
- 952   4      
- 953   4              UINT8 checksum = 0;
- 954   4              UINT8 length =  12;
- 955   4              UINT8 i = 0;
- 956   4      
- 957   4              g_compound_heartbeat_timer = 0;
- 958   4              g_compound_heartbeat_flag = 1;
- 959   4              if (!first_hb_flag)
- 960   4              {
- 961   5                first_hb_flag = 1;
- 962   5                timer0_register_cb(led_flash_handler);
- 963   5              }
+ 939   1      
+ 940   1        if (usb_check_valid_packet(compound_received_data, len))  // ºÏ·¨Êý¾Ý°ü
+ 941   1        {
+ 942   2          // Êý¾Ý°üºÏ·¨£¬¼ÌÐø´¦Àí
+ 943   2          UINT8 opcode = compound_received_data[3];
+ 944   2      
+ 945   2          switch (opcode)
+ 946   2          {
+ 947   3            case USB_OP_HEARTBEAT:
+ 948   3            {
+ 949   4              // ÐÄÌø°ü:ÐÄÌø°üµÄ×é×°µÄdataÊÇ
+ 950   4              //VERSION_STR[0];
+ 951   4                //VERSION_STR[2];
+ 952   4                //VERSION_STR[4];
+ 953   4                //DEVICE_VID_L;           
+ 954   4                //DEVICE_VID_H;           
+ 955   4                //DEVICE_PID_L;           
+ 956   4                //DEVICE_PID_H;
+ 957   4              // ERRCODE = 0x00
+ 958   4      
+ 959   4              // 1. ÒµÎñÂß¼­£¬´¦ÀíÐÄÌø°ü¹¦ÄÜ
+ 960   4      
+ 961   4              UINT8 checksum = 0;
+ 962   4              UINT8 length =  12;
+ 963   4              UINT8 i = 0;
  964   4      
- 965   4              // 2. ×é×°ÏìÓ¦°ü²¢·¢ËÍ
- 966   4              compound_response_data[0] = 0x01;   // Ð­Òé¹Ì¶¨µÄ£¬µÚÒ»¸ö×Ö½ÚµÃÊÇ0x01
- 967   4              compound_response_data[1] = PACKET_HEADER;
- 968   4              compound_response_data[2] = length;
- 969   4              compound_response_data[3] = opcode;
- 970   4              compound_response_data[4] = 0x00; // ERRCODE = 0x00
- 971   4      
- 972   4              compound_response_data[5] = VERSION_STR[0];
- 973   4              compound_response_data[6] = VERSION_STR[2];
- 974   4              compound_response_data[7] = VERSION_STR[4];
- 975   4              compound_response_data[8] = DEVICE_VID_L;
- 976   4              compound_response_data[9] = DEVICE_VID_H;
- 977   4              compound_response_data[10] = DEVICE_PID_L;
- 978   4              compound_response_data[11] = DEVICE_PID_H;
+ 965   4      //        g_compound_heartbeat_timer = 0;
+ 966   4              g_compound_heartbeat_flag = 1;
+ 967   4      //        if (!first_hb_flag)
+ 968   4      //        {
+ 969   4      //          first_hb_flag = 1;
+ 970   4      //          timer0_register_cb(led_flash_handler);
+ 971   4      //        }
+ 972   4      
+ 973   4              // 2. ×é×°ÏìÓ¦°ü²¢·¢ËÍ
+ 974   4              compound_response_data[0] = 0x01;   // Ð­Òé¹Ì¶¨µÄ£¬µÚÒ»¸ö×Ö½ÚµÃÊÇ0x01
+ 975   4              compound_response_data[1] = PACKET_HEADER;
+ 976   4              compound_response_data[2] = length;
+ 977   4              compound_response_data[3] = opcode;
+ 978   4              compound_response_data[4] = 0x00; // ERRCODE = 0x00
  979   4      
- 980   4              // ¼ÆËãÐ£ÑéºÍ£¬¼ÆËã[1] ~ [11]µÄÐ£ÑéºÍ
- 981   4              for (i = 1; i < 12; i++)
- 982   4              {
- 983   5                checksum += compound_response_data[i];
- 984   5              }
- 985   4              compound_response_data[12] = checksum;
- 986   4      
- 987   4              // Ìî³äÊ£ÓàµÄ×Ö½ÚÎª0x00£¬Ö±µ½64×Ö½Ú
- 988   4              memset(&compound_response_data[13], 0, 51);  // 64 - 13 = 51
- 989   4      
- 990   4              // ·¢ËÍÊý¾Ý
- 991   4              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
- 992   4                  UEP2_T_LEN = 64;
- 993   4                  UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+ 980   4              compound_response_data[5] = VERSION_STR[0];
+ 981   4              compound_response_data[6] = VERSION_STR[2];
+ 982   4              compound_response_data[7] = VERSION_STR[4];
+ 983   4              compound_response_data[8] = DEVICE_VID_L;
+ 984   4              compound_response_data[9] = DEVICE_VID_H;
+ 985   4              compound_response_data[10] = DEVICE_PID_L;
+ 986   4              compound_response_data[11] = DEVICE_PID_H;
+ 987   4      
+ 988   4              // ¼ÆËãÐ£ÑéºÍ£¬¼ÆËã[1] ~ [11]µÄÐ£ÑéºÍ
+ 989   4              for (i = 1; i < 12; i++)
+ 990   4              {
+ 991   5                checksum += compound_response_data[i];
+ 992   5              }
+ 993   4              compound_response_data[12] = checksum;
  994   4      
- 995   4              break;
- 996   4            }
- 997   3            case USB_OP_WL_LEARNMATCH:
- 998   3            {
- 999   4              // Ñ§Ï°Æ¥Åä
-1000   4              // Ñ§Ï°Æ¥ÅäÃ»ÓÐdata
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 18  
+ 995   4              // Ìî³äÊ£ÓàµÄ×Ö½ÚÎª0x00£¬Ö±µ½64×Ö½Ú
+ 996   4              memset(&compound_response_data[13], 0, 51);  // 64 - 13 = 51
+ 997   4      
+ 998   4              // ·¢ËÍÊý¾Ý
+ 999   4              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
+1000   4                  UEP2_T_LEN = 64;
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 18  
 
-1001   4              // ERRCODE = 0x00
+1001   4                  UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
 1002   4      
-1003   4              // 1. ÒµÎñÂß¼­£¬Ñ§Ï°Æ¥ÅäÎÞÏß°´¼ü¿ØÖÆUSB¼üÅÌ
-1004   4              // À­µÍP1^6 4s£¬½øÈëÑ§Ï°Ä£Ê½£¬È»ºóÀ­¸ß
-1005   4              // Ê×ÏÈ¿¼ÂÇ×èÈû¿É²»¿ÉÒÔ¡£Èç¹û×èÈû4s£¬ÄÇÃ´¾Ã²»ÄÜ´¦ÀíÆäËûµÄÊý¾Ý°ü£¬Õâ»áÖ±½Óµ¼ÖÂÐÄÌø°üµÄ´¦ÀíÊ§°Ü£¬½ø¶øÖØÆ
+1003   4              break;
+1004   4            }
+1005   3            case USB_OP_WL_LEARNMATCH:
+1006   3            {
+1007   4              // Ñ§Ï°Æ¥Åä
+1008   4              // Ñ§Ï°Æ¥ÅäÃ»ÓÐdata
+1009   4              // ERRCODE = 0x00
+1010   4      
+1011   4              // 1. ÒµÎñÂß¼­£¬Ñ§Ï°Æ¥ÅäÎÞÏß°´¼ü¿ØÖÆUSB¼üÅÌ
+1012   4              // À­µÍP1^6 4s£¬½øÈëÑ§Ï°Ä£Ê½£¬È»ºóÀ­¸ß
+1013   4              // Ê×ÏÈ¿¼ÂÇ×èÈû¿É²»¿ÉÒÔ¡£Èç¹û×èÈû4s£¬ÄÇÃ´¾Ã²»ÄÜ´¦ÀíÆäËûµÄÊý¾Ý°ü£¬Õâ»áÖ±½Óµ¼ÖÂÐÄÌø°üµÄ´¦ÀíÊ§°Ü£¬½ø¶øÖØÆ
              -ôUSBÉè±¸£¬ÕâÊÇ²»ÔÊÐíµÄ
-1006   4              // ËùÒÔ£¬±ØÐëÊ¹ÓÃ·Ç×èÈû·½·¨¡£Ïë·¨ÊÇÀûÓÃÔ­ÓÐµÄ¶¨Ê±Æ÷£¬Ô­À´µÄ¶¨Ê±Æ÷ÊÇ¶¨Ê±10ms£¬ÄÇ¾ÍÊÇ¿ÉÒÔÔÚÕâ¸öÖ÷³ÌÐòÀïÃ
+1014   4              // ËùÒÔ£¬±ØÐëÊ¹ÓÃ·Ç×èÈû·½·¨¡£Ïë·¨ÊÇÀûÓÃÔ­ÓÐµÄ¶¨Ê±Æ÷£¬Ô­À´µÄ¶¨Ê±Æ÷ÊÇ¶¨Ê±10ms£¬ÄÇ¾ÍÊÇ¿ÉÒÔÔÚÕâ¸öÖ÷³ÌÐòÀïÃ
              -æ×¢²á»Øµ÷º¯Êý£¬È»ºóÔÚ»Øµ÷º¯ÊýÀïÃæ¶¨Ê±4s£¬È»ºó¾ÍÊÇÖ÷³ÌÐòÀï4sºóÖ÷³ÌÐòÀïÀ´Ò»¸öÈ«¾Ö±äÁ¿ÖÃÎ»£¬
-1007   4              // ÉÏÎ»»úÏÂ·¢Ñ§Ï°ÃüÁî£¬×´Ì¬»ú½ÓÊÕµ½£¬Á¢¿Ì»Ø¸´usbÖ÷»ú¿ªÊ¼´¦ÀíÑ§Ï°£¬È»ºó½øÈëÑ§Ï°×´Ì¬£ºÀ­µÍP1.6 4s£¬È»ºóÀ
+1015   4              // ÉÏÎ»»úÏÂ·¢Ñ§Ï°ÃüÁî£¬×´Ì¬»ú½ÓÊÕµ½£¬Á¢¿Ì»Ø¸´usbÖ÷»ú¿ªÊ¼´¦ÀíÑ§Ï°£¬È»ºó½øÈëÑ§Ï°×´Ì¬£ºÀ­µÍP1.6 4s£¬È»ºóÀ
              -­¸ß£»Õâ¸öÔõÃ´Í¨¹ý·Ç×èÈûµÄ·½·¨ÊµÏÖÄØ£¿
-1008   4      
-1009   4              UINT8 checksum = 0;
-1010   4              UINT8 length = 5; // header + length + opcode + ERRCODE + checksum
-1011   4              UINT8 i = 0;
-1012   4      
-1013   4      
-1014   4              if (learnmatch_state == LEARNMATCH_STATE_IDLE)
-1015   4              {
-1016   5                WL_LEARN_PIN = 0;
-1017   5                learnmatch_state = LEARNMATCH_STATE_ACTIVE;
-1018   5                g_learnmatch_timer = 0;
-1019   5              }
+1016   4      
+1017   4              UINT8 checksum = 0;
+1018   4              UINT8 length = 5; // header + length + opcode + ERRCODE + checksum
+1019   4              UINT8 i = 0;
 1020   4      
-1021   4              // 2. ×é×°ÏìÓ¦°ü²¢·¢ËÍ
-1022   4              compound_response_data[0] = 0x01;   // Ð­Òé¹Ì¶¨µÄ£¬µÚÒ»¸ö×Ö½ÚµÃÊÇ0x01
-1023   4              compound_response_data[1] = PACKET_HEADER;
-1024   4              compound_response_data[2] = length;
-1025   4              compound_response_data[3] = opcode;
-1026   4              compound_response_data[4] = 0x00; // ERRCODE = 0x00,±íÊ¾³É¹¦
-1027   4      
-1028   4              for (i = 1; i < 5; i++)
-1029   4              {
-1030   5                checksum += compound_response_data[i];
-1031   5              }
-1032   4              compound_response_data[5] = checksum;
-1033   4              memset(&compound_response_data[6], 0, 58);  // 64 - 6 = 58
-1034   4      
-1035   4              // ·¢ËÍÊý¾Ý
-1036   4              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
-1037   4              UEP2_T_LEN = 64;
-1038   4              UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-1039   4      
-1040   4              break;
-1041   4            }
-1042   3            case USB_OP_WL_CLEANMATCH:
-1043   3            {
-1044   4              // Çå¿ÕÆ¥Åä
-1045   4              // Çå¿ÕÆ¥ÅäÃ»ÓÐdata
-1046   4              // ERRCODE = 0x00
-1047   4              // Çå¿ÕÆ¥ÅäºÍÑ§Ï°Æ¥ÅäµÄÇø±ðÊÇ£¬Çå¿ÕÆ¥ÅäÊÇÀ­µÍ11s£¬È»ºóÀ­¸ß
-1048   4              UINT8 checksum = 0;
-1049   4              UINT8 length = 5; // header + length + opcode + ERRCODE + checksum
-1050   4              UINT8 i = 0;
-1051   4      
-1052   4      
-1053   4              if (cleanmatch_state == CLEANMATCH_STATE_IDLE)
-1054   4              {
-1055   5                WL_LEARN_PIN = 0;
-1056   5                cleanmatch_state = CLEANMATCH_STATE_ACTIVE;
-1057   5                g_cleanmatch_timer = 0;
-1058   5              }
+1021   4      
+1022   4              if (learnmatch_state == LEARNMATCH_STATE_IDLE)
+1023   4              {
+1024   5                WL_LEARN_PIN = 0;
+1025   5                learnmatch_state = LEARNMATCH_STATE_ACTIVE;
+1026   5                g_learnmatch_timer = 0;
+1027   5              }
+1028   4      
+1029   4              // 2. ×é×°ÏìÓ¦°ü²¢·¢ËÍ
+1030   4              compound_response_data[0] = 0x01;   // Ð­Òé¹Ì¶¨µÄ£¬µÚÒ»¸ö×Ö½ÚµÃÊÇ0x01
+1031   4              compound_response_data[1] = PACKET_HEADER;
+1032   4              compound_response_data[2] = length;
+1033   4              compound_response_data[3] = opcode;
+1034   4              compound_response_data[4] = 0x00; // ERRCODE = 0x00,±íÊ¾³É¹¦
+1035   4      
+1036   4              for (i = 1; i < 5; i++)
+1037   4              {
+1038   5                checksum += compound_response_data[i];
+1039   5              }
+1040   4              compound_response_data[5] = checksum;
+1041   4              memset(&compound_response_data[6], 0, 58);  // 64 - 6 = 58
+1042   4      
+1043   4              // ·¢ËÍÊý¾Ý
+1044   4              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
+1045   4              UEP2_T_LEN = 64;
+1046   4              UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+1047   4      
+1048   4              break;
+1049   4            }
+1050   3            case USB_OP_WL_CLEANMATCH:
+1051   3            {
+1052   4              // Çå¿ÕÆ¥Åä
+1053   4              // Çå¿ÕÆ¥ÅäÃ»ÓÐdata
+1054   4              // ERRCODE = 0x00
+1055   4              // Çå¿ÕÆ¥ÅäºÍÑ§Ï°Æ¥ÅäµÄÇø±ðÊÇ£¬Çå¿ÕÆ¥ÅäÊÇÀ­µÍ11s£¬È»ºóÀ­¸ß
+1056   4              UINT8 checksum = 0;
+1057   4              UINT8 length = 5; // header + length + opcode + ERRCODE + checksum
+1058   4              UINT8 i = 0;
 1059   4      
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 19  
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 19  
 
-1060   4              // 2. ×é×°ÏìÓ¦°ü²¢·¢ËÍ
-1061   4              compound_response_data[0] = 0x01;   // Ð­Òé¹Ì¶¨µÄ£¬µÚÒ»¸ö×Ö½ÚµÃÊÇ0x01
-1062   4              compound_response_data[1] = PACKET_HEADER;
-1063   4              compound_response_data[2] = length;
-1064   4              compound_response_data[3] = opcode;
-1065   4              compound_response_data[4] = 0x00; // ERRCODE = 0x00,±íÊ¾³É¹¦
-1066   4      
-1067   4              for (i = 1; i < 5; i++)
-1068   4              {
-1069   5                checksum += compound_response_data[i];
-1070   5              }
-1071   4              compound_response_data[5] = checksum;
-1072   4              memset(&compound_response_data[6], 0, 58);  // 64 - 6 = 58
-1073   4      
-1074   4              // ·¢ËÍÊý¾Ý
-1075   4              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
-1076   4              UEP2_T_LEN = 64;
-1077   4              UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-1078   4      
-1079   4              break;
-1080   4            }
-1081   3      
-1082   3            default:
-1083   3            {
-1084   4              // Î´ÖªµÄOPCODE, ÐèÒª»Ø¸´´íÎóÂë
-1085   4              // Î´ÖªµÄOPCODEµÄdataÊÇ¿ÕµÄ
-1086   4              // ERRCODE = 0x01
+1060   4      
+1061   4              if (cleanmatch_state == CLEANMATCH_STATE_IDLE)
+1062   4              {
+1063   5                WL_LEARN_PIN = 0;
+1064   5                cleanmatch_state = CLEANMATCH_STATE_ACTIVE;
+1065   5                g_cleanmatch_timer = 0;
+1066   5              }
+1067   4      
+1068   4              // 2. ×é×°ÏìÓ¦°ü²¢·¢ËÍ
+1069   4              compound_response_data[0] = 0x01;   // Ð­Òé¹Ì¶¨µÄ£¬µÚÒ»¸ö×Ö½ÚµÃÊÇ0x01
+1070   4              compound_response_data[1] = PACKET_HEADER;
+1071   4              compound_response_data[2] = length;
+1072   4              compound_response_data[3] = opcode;
+1073   4              compound_response_data[4] = 0x00; // ERRCODE = 0x00,±íÊ¾³É¹¦
+1074   4      
+1075   4              for (i = 1; i < 5; i++)
+1076   4              {
+1077   5                checksum += compound_response_data[i];
+1078   5              }
+1079   4              compound_response_data[5] = checksum;
+1080   4              memset(&compound_response_data[6], 0, 58);  // 64 - 6 = 58
+1081   4      
+1082   4              // ·¢ËÍÊý¾Ý
+1083   4              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
+1084   4              UEP2_T_LEN = 64;
+1085   4              UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+1086   4      
 1087   4              break;
 1088   4            }
 1089   3      
-1090   3          }
-1091   2      
-1092   2        }
-1093   1        else  // ·Ç·¨Êý¾Ý°ü echoÄ£Ê½
-1094   1        {
-1095   2              memcpy(compound_response_data, compound_received_data, len);
-1096   2              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, len);
-1097   2              UEP2_T_LEN = len;
-1098   2              UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-1099   2        }
-1100   1      
-1101   1          // UINT8 checksum = 0;
-1102   1          // UINT8 i;  /* ÒÆµ½º¯Êý¿ªÊ¼´¦ÉùÃ÷ */
-1103   1          
-1104   1      
-1105   1        
-1106   1          // if (usb_check_heartbeat_packet(compound_received_data, len))
-1107   1          // {
-1108   1        //  g_compound_heartbeat_timer = 0;
-1109   1        //  g_compound_heartbeat_flag = 1;
-1110   1      
-1111   1          //     // compound_response_data[0] = PACKET_HEADER;
-1112   1          //     // compound_response_data[1] = PACKET_OPCODE_HEART;
-1113   1          //     // compound_response_data[2] = VERSION_STR[0];
-1114   1          //     // compound_response_data[3] = VERSION_STR[2];
-1115   1          //     // compound_response_data[4] = VERSION_STR[4];
-1116   1          //     // compound_response_data[5] = DEVICE_VID_L;           
-1117   1          //     // compound_response_data[6] = DEVICE_VID_H;           
-1118   1          //     // compound_response_data[7] = DEVICE_PID_L;           
-1119   1          //     // compound_response_data[8] = DEVICE_PID_H;           
-1120   1              
-1121   1          //     // for(i = 0; i < 9; i++) 
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 20  
+1090   3            default:
+1091   3            {
+1092   4              // Î´ÖªµÄOPCODE, ÐèÒª»Ø¸´´íÎóÂë
+1093   4              // Î´ÖªµÄOPCODEµÄdataÊÇ¿ÕµÄ
+1094   4              // ERRCODE = 0x01
+1095   4              break;
+1096   4            }
+1097   3      
+1098   3          }
+1099   2      
+1100   2        }
+1101   1        else  // ·Ç·¨Êý¾Ý°ü echoÄ£Ê½
+1102   1        {
+1103   2              memcpy(compound_response_data, compound_received_data, len);
+1104   2              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, len);
+1105   2              UEP2_T_LEN = len;
+1106   2              UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+1107   2        }
+1108   1      
+1109   1          // UINT8 checksum = 0;
+1110   1          // UINT8 i;  /* ÒÆµ½º¯Êý¿ªÊ¼´¦ÉùÃ÷ */
+1111   1          
+1112   1      
+1113   1        
+1114   1          // if (usb_check_heartbeat_packet(compound_received_data, len))
+1115   1          // {
+1116   1        //  g_compound_heartbeat_timer = 0;
+1117   1        //  g_compound_heartbeat_flag = 1;
+1118   1      
+1119   1          //     // compound_response_data[0] = PACKET_HEADER;
+1120   1          //     // compound_response_data[1] = PACKET_OPCODE_HEART;
+1121   1          //     // compound_response_data[2] = VERSION_STR[0];
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 20  
 
-1122   1          //     // {
-1123   1          //     //     checksum += compound_response_data[i];
-1124   1          //     // }
-1125   1          //     // compound_response_data[9] = checksum;
-1126   1              
-1127   1          //     // memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 10);  
-1128   1          //     // UEP2_T_LEN = 10;
-1129   1          //     // UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-1130   1              
-1131   1          //     // if (!first_hb_flag)
-1132   1          //     // {
-1133   1          //     //     first_hb_flag = 1;
-1134   1          //     //     timer0_register_cb(led_flash_handler);
-1135   1          //     // }
-1136   1        //  compound_response_data[0] = 0x01;
-1137   1        //  compound_response_data[1] = PACKET_HEADER;
-1138   1          //     compound_response_data[2] = PACKET_OPCODE_HEART;
-1139   1          //     compound_response_data[3] = VERSION_STR[0];
-1140   1          //     compound_response_data[4] = VERSION_STR[2];
-1141   1          //     compound_response_data[5] = VERSION_STR[4];
-1142   1          //     compound_response_data[6] = DEVICE_VID_L;           
-1143   1          //     compound_response_data[7] = DEVICE_VID_H;           
-1144   1          //     compound_response_data[8] = DEVICE_PID_L;           
-1145   1          //     compound_response_data[9] = DEVICE_PID_H;           
-1146   1              
-1147   1          //     for(i = 1; i < 10; i++) 
-1148   1          //     {
-1149   1          //         checksum += compound_response_data[i];
-1150   1          //     }
-1151   1          //     compound_response_data[10] = checksum;
-1152   1          //     // Ìî³äÊ£ÓàµÄ×Ö½ÚÎª0x00£¬Ö±µ½64×Ö½Ú
-1153   1          //     memset(&compound_response_data[11], 0, 53);  // 64 - 11 = 53 
-1154   1      
-1155   1          //     memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
-1156   1          //     UEP2_T_LEN = 64;
-1157   1          //     UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-1158   1              
-1159   1          //     if (!first_hb_flag)
-1160   1          //     {
-1161   1          //         first_hb_flag = 1;
-1162   1          //         timer0_register_cb(led_flash_handler);
-1163   1          //     }
-1164   1          // }
-1165   1          // else
-1166   1          // {
-1167   1          //     memcpy(compound_response_data, compound_received_data, len);
-1168   1          //     memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, len);
-1169   1          //     UEP2_T_LEN = len;
-1170   1          //     UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-1171   1          // }
-1172   1      }
-1173          
-1174          
+1122   1          //     // compound_response_data[3] = VERSION_STR[2];
+1123   1          //     // compound_response_data[4] = VERSION_STR[4];
+1124   1          //     // compound_response_data[5] = DEVICE_VID_L;           
+1125   1          //     // compound_response_data[6] = DEVICE_VID_H;           
+1126   1          //     // compound_response_data[7] = DEVICE_PID_L;           
+1127   1          //     // compound_response_data[8] = DEVICE_PID_H;           
+1128   1              
+1129   1          //     // for(i = 0; i < 9; i++) 
+1130   1          //     // {
+1131   1          //     //     checksum += compound_response_data[i];
+1132   1          //     // }
+1133   1          //     // compound_response_data[9] = checksum;
+1134   1              
+1135   1          //     // memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 10);  
+1136   1          //     // UEP2_T_LEN = 10;
+1137   1          //     // UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+1138   1              
+1139   1          //     // if (!first_hb_flag)
+1140   1          //     // {
+1141   1          //     //     first_hb_flag = 1;
+1142   1          //     //     timer0_register_cb(led_flash_handler);
+1143   1          //     // }
+1144   1        //  compound_response_data[0] = 0x01;
+1145   1        //  compound_response_data[1] = PACKET_HEADER;
+1146   1          //     compound_response_data[2] = PACKET_OPCODE_HEART;
+1147   1          //     compound_response_data[3] = VERSION_STR[0];
+1148   1          //     compound_response_data[4] = VERSION_STR[2];
+1149   1          //     compound_response_data[5] = VERSION_STR[4];
+1150   1          //     compound_response_data[6] = DEVICE_VID_L;           
+1151   1          //     compound_response_data[7] = DEVICE_VID_H;           
+1152   1          //     compound_response_data[8] = DEVICE_PID_L;           
+1153   1          //     compound_response_data[9] = DEVICE_PID_H;           
+1154   1              
+1155   1          //     for(i = 1; i < 10; i++) 
+1156   1          //     {
+1157   1          //         checksum += compound_response_data[i];
+1158   1          //     }
+1159   1          //     compound_response_data[10] = checksum;
+1160   1          //     // Ìî³äÊ£ÓàµÄ×Ö½ÚÎª0x00£¬Ö±µ½64×Ö½Ú
+1161   1          //     memset(&compound_response_data[11], 0, 53);  // 64 - 11 = 53 
+1162   1      
+1163   1          //     memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
+1164   1          //     UEP2_T_LEN = 64;
+1165   1          //     UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+1166   1              
+1167   1          //     if (!first_hb_flag)
+1168   1          //     {
+1169   1          //         first_hb_flag = 1;
+1170   1          //         timer0_register_cb(led_flash_handler);
+1171   1          //     }
+1172   1          // }
+1173   1          // else
+1174   1          // {
+1175   1          //     memcpy(compound_response_data, compound_received_data, len);
+1176   1          //     memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, len);
+1177   1          //     UEP2_T_LEN = len;
+1178   1          //     UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+1179   1          // }
+1180   1      }
+1181          
+1182          
+
+C51 COMPILER V9.54   COMPOUND                                                              12/05/2024 11:39:01 PAGE 21  
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   2829    ----
+   CODE SIZE        =   2840    ----
    CONSTANT SIZE    =    228    ----
-   XDATA SIZE       =    231      18
+   XDATA SIZE       =    231      19
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
-C51 COMPILER V9.54   COMPOUND                                                              12/02/2024 10:23:19 PAGE 21  
-
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.
 

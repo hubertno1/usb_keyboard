@@ -1,4 +1,4 @@
-C51 COMPILER V9.54   MAIN                                                                  12/02/2024 10:23:19 PAGE 1   
+C51 COMPILER V9.54   MAIN                                                                  12/05/2024 14:30:36 PAGE 1   
 
 
 C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
@@ -23,7 +23,7 @@ line level    source
   13          #include    "key.h"
   14          #include    "Timer.H"
   15          
-  16          sbit LED1 = P1^6;
+  16          sbit LED1 = P1^6;     //  P1^6; P3^2;
   17          
   18          extern UINT8  FLAG;                         // Trans complete flag
   19          extern UINT8  EnumOK;                       // Enum ok flag
@@ -62,7 +62,7 @@ line level    source
   52   1          if(++g_compound_heartbeat_timer >= 50) 
   53   1          {  
   54   2              soft_reset();
-C51 COMPILER V9.54   MAIN                                                                  12/02/2024 10:23:19 PAGE 2   
+C51 COMPILER V9.54   MAIN                                                                  12/05/2024 14:30:36 PAGE 2   
 
   55   2          } 
   56   1      
@@ -74,7 +74,7 @@ line level    source
   62   1        {
   63   2            case KEY_EVENT_PRESSED:
   64   2            {
-  65   3                usb_send_key("#");
+  65   3                usb_send_key("a");
   66   3              LED1 = 0;
   67   3            mDelaymS(10);
   68   3            LED1 = 1;
@@ -86,7 +86,7 @@ line level    source
   74   2      
   75   2            case KEY_EVENT_RELEASED:
   76   2            {
-  77   3                usb_send_key("#");
+  77   3                usb_send_key("a");
   78   3              LED1 = 0;
   79   3            mDelaymS(10);
   80   3            LED1 = 1;
@@ -117,16 +117,16 @@ line level    source
  105   1        mInitSTDIO( );                            // Init UART0
  106   1      
  107   1        LED1 = 0;
- 108   1        mDelaymS(5);
+ 108   1        mDelaymS(20);
  109   1        LED1 = 1;
- 110   1        mDelaymS(5);
+ 110   1        mDelaymS(20);
  111   1        
  112   1      
  113   1      #if DE_PRINTF
                   printf( "Start config.\r\n" );
                   printf( "Init USB device.\r\n" );
               #endif
-C51 COMPILER V9.54   MAIN                                                                  12/02/2024 10:23:19 PAGE 3   
+C51 COMPILER V9.54   MAIN                                                                  12/05/2024 14:30:36 PAGE 3   
 
  117   1      
  118   1        USBDeviceInit();                          // Configure the USB module,the Endpoint and the USB Interrupt
@@ -142,56 +142,96 @@ line level    source
  128   1        // timer0_register_cb(led_flash_handler);
  129   1        wdog_init();             // 初始化看门狗
  130   1        
- 131   1      
+ 131   1      mDelaymS(500);
  132   1      
  133   1      
- 134   1        while(1)
- 135   1        {
- 136   2      
- 137   2            if (EnumOK)
- 138   2            {
- 139   3                if (g_data_ready)
- 140   3                {
- 141   4                    compound_process_recv_data(g_data_len);
- 142   4                    g_data_ready = 0;
- 143   4                }
- 144   3      
- 145   3                // HIDValueHandle();     // 处理HID数据
- 146   3                key_scan();
- 147   3            }
- 148   2            
- 149   2              WDOG_COUNT = 0x6F;  // 重置看门狗计数器以防止超时复位
- 150   2      
- 151   2            mDelaymS(10);
- 152   2        }
- 153   1      }
- 154          
- 155          void wdog_init(void)
- 156          {
- 157   1          // 启用安全模式，写寄存器使能
- 158   1          SAFE_MOD = 0x55; // 进入安全模式
- 159   1          SAFE_MOD = 0xAA;
- 160   1      
- 161   1          // 设置 WDOG_COUNT 初始值
- 162   1          WDOG_COUNT = 0x49;  // 设置为约 10 秒的计数值 (主频 12MHz)
- 163   1      
- 164   1          // 使能看门狗
- 165   1          GLOBAL_CFG |= bWDOG_EN;  // 允许看门狗复位
- 166   1      }
- 167          
- 168          /**************************** END *************************************/
- 169          
- 170          
+ 134   1      
+ 135   1        while(1)
+ 136   1        {
+ 137   2          static UINT8 my_cnt = 0;
+ 138   2          
+ 139   2      //    if (!EnumOK)
+ 140   2      //    {
+ 141   2      //      soft_reset();
+ 142   2      //    }
+ 143   2      
+ 144   2            if (EnumOK)
+ 145   2            {
+ 146   3              UINT8 i = 1;
+ 147   3              do
+ 148   3              {
+ 149   4              LED1 = 1;
+ 150   4              } while (i--);
+ 151   3                if (g_data_ready)
+ 152   3                {
+ 153   4                    compound_process_recv_data(g_data_len);
+ 154   4                    g_data_ready = 0;
+ 155   4                }
+ 156   3      
+ 157   3                // HIDValueHandle();     // 处理HID数据
+ 158   3                key_scan();
+ 159   3            }
+ 160   2            else    /* 如果是一直枚举不起来，那就软复位，重新枚举 */
+ 161   2            {
+ 162   3              my_cnt ++;
+ 163   3      
+ 164   3              LED1 = 1;
+ 165   3              mDelaymS(10);
+ 166   3              LED1 = 0;
+ 167   3              mDelaymS(10);
+ 168   3              
+ 169   3              if (my_cnt >= 100)
+ 170   3              {
+ 171   4      //          soft_reset();
+ 172   4                my_cnt = 0; 
+ 173   4                
+ 174   4                
+ 175   4                EA = 0;  
+ 176   4                UEP1_T_LEN = 0;  
+ 177   4                UEP2_T_LEN = 0;  
+ 178   4                FLAG = 0;
+C51 COMPILER V9.54   MAIN                                                                  12/05/2024 14:30:36 PAGE 4   
+
+ 179   4                EnumOK = 0;
+ 180   4                
+ 181   4                USBDeviceInit();  
+ 182   4                
+ 183   4                EA = 1;
+ 184   4                
+ 185   4              }
+ 186   3              
+ 187   3            }
+ 188   2            
+ 189   2              WDOG_COUNT = 0x6F;  // 重置看门狗计数器以防止超时复位
+ 190   2      
+ 191   2            mDelaymS(10);
+ 192   2        }
+ 193   1      }
+ 194          
+ 195          void wdog_init(void)
+ 196          {
+ 197   1          // 启用安全模式，写寄存器使能
+ 198   1          SAFE_MOD = 0x55; // 进入安全模式
+ 199   1          SAFE_MOD = 0xAA;
+ 200   1      
+ 201   1          // 设置 WDOG_COUNT 初始值
+ 202   1          WDOG_COUNT = 0x49;  // 设置为约 10 秒的计数值 (主频 12MHz)
+ 203   1      
+ 204   1          // 使能看门狗
+ 205   1          GLOBAL_CFG |= bWDOG_EN;  // 允许看门狗复位
+ 206   1      }
+ 207          
+ 208          /**************************** END *************************************/
+ 209          
+ 210          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    260    ----
+   CODE SIZE        =    341    ----
    CONSTANT SIZE    =      2    ----
-   XDATA SIZE       =   ----       2
+   XDATA SIZE       =      1       3
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
-C51 COMPILER V9.54   MAIN                                                                  12/02/2024 10:23:19 PAGE 4   
-
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.

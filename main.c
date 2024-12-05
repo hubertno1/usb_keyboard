@@ -13,7 +13,7 @@
 #include    "key.h"
 #include    "Timer.H"
 
-sbit LED1 = P1^6;
+sbit LED1 = P1^6;			//  P1^6; P3^2;
 
 extern UINT8 	FLAG;												  // Trans complete flag
 extern UINT8 	EnumOK;												// Enum ok flag
@@ -62,7 +62,7 @@ void handle_key_event(key_event_t event)
   {
       case KEY_EVENT_PRESSED:
       {
-          usb_send_key("#");
+          usb_send_key("a");
 		    LED1 = 0;
 			mDelaymS(10);
 			LED1 = 1;
@@ -74,7 +74,7 @@ void handle_key_event(key_event_t event)
 
       case KEY_EVENT_RELEASED:
       {
-          usb_send_key("#");
+          usb_send_key("a");
 		  	LED1 = 0;
 			mDelaymS(10);
 			LED1 = 1;
@@ -105,9 +105,9 @@ void main(void)
   mInitSTDIO( );                            // Init UART0
 
   LED1 = 0;
-  mDelaymS(5);
+  mDelaymS(20);
   LED1 = 1;
-  mDelaymS(5);
+  mDelaymS(20);
   
 
 #if	DE_PRINTF
@@ -128,14 +128,26 @@ void main(void)
   // timer0_register_cb(led_flash_handler);
   wdog_init();             // 初始化看门狗
   
+mDelaymS(500);
 
 
 
   while(1)
   {
+		static UINT8 my_cnt = 0;
+		
+//		if (!EnumOK)
+//		{
+//			soft_reset();
+//		}
 
     	if (EnumOK)
       {
+				UINT8 i = 1;
+				do
+				{
+				LED1 = 1;
+				} while (i--);
           if (g_data_ready)
           {
               compound_process_recv_data(g_data_len);
@@ -145,6 +157,34 @@ void main(void)
           // HIDValueHandle();		 // 处理HID数据
           key_scan();
       }
+			else		/* 如果是一直枚举不起来，那就软复位，重新枚举 */
+			{
+				my_cnt ++;
+
+				LED1 = 1;
+				mDelaymS(10);
+				LED1 = 0;
+				mDelaymS(10);
+				
+				if (my_cnt >= 100)
+				{
+//					soft_reset();
+					my_cnt = 0; 
+					
+					
+					EA = 0;  
+					UEP1_T_LEN = 0;  
+					UEP2_T_LEN = 0;  
+					FLAG = 0;
+					EnumOK = 0;
+					
+					USBDeviceInit();  
+					
+					EA = 1;
+					
+				}
+				
+			}
       
         WDOG_COUNT = 0x6F;  // 重置看门狗计数器以防止超时复位
 

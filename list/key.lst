@@ -1,4 +1,4 @@
-C51 COMPILER V9.54   KEY                                                                   12/02/2024 10:23:19 PAGE 1   
+C51 COMPILER V9.54   KEY                                                                   12/05/2024 11:31:51 PAGE 1   
 
 
 C51 COMPILER V9.54, COMPILATION OF MODULE KEY
@@ -42,95 +42,96 @@ line level    source
   32   2          }
   33   1          else
   34   1          {
-  35   2              key_mode = KEY_MODE_RISING;
-  36   2          }
-  37   1      
-  38   1      }
-  39          
-  40          void register_key_cb(key_cb_t cb)
-  41          {
-  42   1          key_cb = cb;
-  43   1      }
-  44          
-  45          static key_event_t get_key_event(void)
-  46          {
-  47   1          key_event_t event = KEY_EVENT_NONE;
-  48   1          switch (key_state)
-  49   1          {
-  50   2              case KEY_STATE_IDLE:
-  51   2              {
-  52   3                  if (KEY == 0)
-  53   3                      key_state = KEY_STATE_DEBOUNCE_PRESS;
-  54   3                  
-C51 COMPILER V9.54   KEY                                                                   12/02/2024 10:23:19 PAGE 2   
+  35   2              KEY = 1;
+  36   2              key_mode = KEY_MODE_RISING;
+  37   2          }
+  38   1      
+  39   1      }
+  40          
+  41          void register_key_cb(key_cb_t cb)
+  42          {
+  43   1          key_cb = cb;
+  44   1      }
+  45          
+  46          static key_event_t get_key_event(void)
+  47          {
+  48   1          key_event_t event = KEY_EVENT_NONE;
+  49   1          switch (key_state)
+  50   1          {
+  51   2              case KEY_STATE_IDLE:
+  52   2              {
+  53   3                  if (KEY == 0)
+  54   3                      key_state = KEY_STATE_DEBOUNCE_PRESS;
+C51 COMPILER V9.54   KEY                                                                   12/05/2024 11:31:51 PAGE 2   
 
-  55   3                  break;
-  56   3              }
-  57   2              case KEY_STATE_DEBOUNCE_PRESS:
-  58   2              {
-  59   3                  /* 后续考虑定时器，这样不会阻塞程序 */
-  60   3                  mDelaymS(10);
-  61   3                  if (KEY == 0)
-  62   3                  {
-  63   4                      key_state = KEY_STATE_PRESSED;
-  64   4      
-  65   4                      if (key_mode == KEY_MODE_EDGE)
-  66   4                      {
-  67   5                          event = KEY_EVENT_PRESSED;
-  68   5                      }
-  69   4                  }
-  70   3                  else
-  71   3                  {
-  72   4                      key_state = KEY_STATE_IDLE;
-  73   4                  }
-  74   3                  break;
-  75   3              }
-  76   2              case KEY_STATE_PRESSED:
-  77   2              {
-  78   3                  if (KEY == 1)
-  79   3                  {
-  80   4                      key_state = KEY_STATE_DEBOUNCE_RELEASE;
-  81   4                  }
-  82   3                  break;
-  83   3              }
-  84   2              case KEY_STATE_DEBOUNCE_RELEASE:
-  85   2              {
-  86   3                  mDelaymS(10);
-  87   3                  if (KEY == 1)
-  88   3                  {
-  89   4                      key_state = KEY_STATE_IDLE;
-  90   4                      event = KEY_EVENT_RELEASED;
-  91   4                  }
-  92   3                  else
-  93   3                  {
-  94   4                      key_state = KEY_STATE_PRESSED;
-  95   4                  }
-  96   3                  break;
-  97   3              }
-  98   2      
-  99   2              default:
- 100   2              {
- 101   3                  key_state = KEY_STATE_IDLE;
- 102   3                  break;
- 103   3              }
- 104   2      
- 105   2          }
- 106   1      
- 107   1          return event;
- 108   1      }
- 109          
- 110          void key_scan(void)
- 111          {
- 112   1          key_event_t evt = get_key_event();
- 113   1          if (evt != KEY_EVENT_NONE && key_cb != NULL)
- 114   1              key_cb(evt);
- 115   1      }
+  55   3                  
+  56   3                  break;
+  57   3              }
+  58   2              case KEY_STATE_DEBOUNCE_PRESS:
+  59   2              {
+  60   3                  /* 后续考虑定时器，这样不会阻塞程序 */
+  61   3                  mDelaymS(10);
+  62   3                  if (KEY == 0)
+  63   3                  {
+  64   4                      key_state = KEY_STATE_PRESSED;
+  65   4      
+  66   4                      if (key_mode == KEY_MODE_EDGE)
+  67   4                      {
+  68   5                          event = KEY_EVENT_PRESSED;
+  69   5                      }
+  70   4                  }
+  71   3                  else
+  72   3                  {
+  73   4                      key_state = KEY_STATE_IDLE;
+  74   4                  }
+  75   3                  break;
+  76   3              }
+  77   2              case KEY_STATE_PRESSED:
+  78   2              {
+  79   3                  if (KEY == 1)
+  80   3                  {
+  81   4                      key_state = KEY_STATE_DEBOUNCE_RELEASE;
+  82   4                  }
+  83   3                  break;
+  84   3              }
+  85   2              case KEY_STATE_DEBOUNCE_RELEASE:
+  86   2              {
+  87   3                  mDelaymS(10);
+  88   3                  if (KEY == 1)
+  89   3                  {
+  90   4                      key_state = KEY_STATE_IDLE;
+  91   4                      event = KEY_EVENT_RELEASED;
+  92   4                  }
+  93   3                  else
+  94   3                  {
+  95   4                      key_state = KEY_STATE_PRESSED;
+  96   4                  }
+  97   3                  break;
+  98   3              }
+  99   2      
+ 100   2              default:
+ 101   2              {
+ 102   3                  key_state = KEY_STATE_IDLE;
+ 103   3                  break;
+ 104   3              }
+ 105   2      
+ 106   2          }
+ 107   1      
+ 108   1          return event;
+ 109   1      }
+ 110          
+ 111          void key_scan(void)
+ 112          {
+ 113   1          key_event_t evt = get_key_event();
+ 114   1          if (evt != KEY_EVENT_NONE && key_cb != NULL)
+ 115   1              key_cb(evt);
+ 116   1      }
+C51 COMPILER V9.54   KEY                                                                   12/05/2024 11:31:51 PAGE 3   
 
-C51 COMPILER V9.54   KEY                                                                   12/02/2024 10:23:19 PAGE 3   
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    194    ----
+   CODE SIZE        =    196    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =      5       1
    PDATA SIZE       =   ----    ----
