@@ -12,6 +12,7 @@
 #include 	"stdio.h"
 #include    "key.h"
 #include    "Timer.H"
+#include "DataFlash.h"
 
 sbit LED1 = P1^6;			//  P1^6; P3^2;
 
@@ -62,7 +63,8 @@ void handle_key_event(key_event_t event)
   {
       case KEY_EVENT_PRESSED:
       {
-          usb_send_key("a");
+          // usb_send_key("a");
+          usb_send_keys_from_flash();
 		    LED1 = 0;
 			mDelaymS(10);
 			LED1 = 1;
@@ -74,7 +76,8 @@ void handle_key_event(key_event_t event)
 
       case KEY_EVENT_RELEASED:
       {
-          usb_send_key("a");
+          //usb_send_key("a");
+          usb_send_keys_from_flash();
 		  	LED1 = 0;
 			mDelaymS(10);
 			LED1 = 1;
@@ -108,7 +111,8 @@ void main(void)
   mDelaymS(20);
   LED1 = 1;
   mDelaymS(20);
-  
+
+ ReadDataFlash(KEY_VALUES_OFFSET, 8, g_key_values);
 
 #if	DE_PRINTF
     printf( "Start config.\r\n" );
@@ -135,6 +139,7 @@ mDelaymS(500);
   while(1)
   {
 		static UINT8 my_cnt = 0;
+    static UINT8 fail_cnt = 0;
 		
 //		if (!EnumOK)
 //		{
@@ -143,11 +148,11 @@ mDelaymS(500);
 
     	if (EnumOK)
       {
-				UINT8 i = 1;
-				do
-				{
-				LED1 = 1;
-				} while (i--);
+//				UINT8 i = 1;
+//				do
+//				{
+//				LED1 = 1;
+//				} while (i--);
           if (g_data_ready)
           {
               compound_process_recv_data(g_data_len);
@@ -161,10 +166,10 @@ mDelaymS(500);
 			{
 				my_cnt ++;
 
-				LED1 = 1;
-				mDelaymS(10);
-				LED1 = 0;
-				mDelaymS(10);
+//				LED1 = 1;
+//				mDelaymS(10);
+//				LED1 = 0;
+//				mDelaymS(10);
 				
 				if (my_cnt >= 100)
 				{
@@ -181,6 +186,13 @@ mDelaymS(500);
 					USBDeviceInit();  
 					
 					EA = 1;
+
+          fail_cnt ++;
+
+          if (fail_cnt >= 3)
+          {
+            soft_reset();
+          }
 					
 				}
 				

@@ -3,6 +3,7 @@
         "Compound.C": "cpp",
         "Touch_Key.C": "cpp",
         "DEBUG.C": "cpp",
-        "Timer.C": "cpp"
+        "Timer.C": "cpp",
+        "DataFlash.C": "cpp"
     }
 }

@@ -15,7 +15,7 @@
 #include 	<stdio.h>
 #include 	<stdlib.h>
 #include 	<string.h>
-
+#include 	"DataFlash.h"
 
 #define 	THIS_ENDP0_SIZE         DEFAULT_ENDP0_SIZE
 #define		BUFFER_SIZE				64
@@ -86,7 +86,8 @@ volatile cleanmatch_state_t cleanmatch_state = CLEANMATCH_STATE_IDLE;
 volatile UINT16 g_cleanmatch_timer = 0;	// 计时器，单位为10ms
 
 sbit LED1 = P3^2;
-
+// #define KEY_VALUES_OFFSET 0x40			/* Data flash从C000H - C0FFH，其中只有偶数地址有效，也就是只有128字节有效 */
+UINT8 g_key_values[8] = {0};		/* 用于存储按键值 */
 
 /**************************** Device Descriptor *************************************/
 UINT8C DevDesc[18] = {																// Device Descriptor
@@ -638,7 +639,7 @@ static void SendKey ( char *p )
 				HIDKey[2] = 0x33;
 				break;
 			case '+':
-				HIDKey[0] = 0x000;
+				HIDKey[0] = 0x00;
 				HIDKey[2] = 0x57;
 				break;
 			case '_':
@@ -700,37 +701,37 @@ static void UploadData(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-extern void HIDValueHandle( void )
-{
-	static UINT8 rotateFlag = 0;																// When upload keys complete, upload EP2 data
-  UINT16 KeyData = TouchKeyButton;
-  if(TKEY_CTRL&bTKC_IF)		                                    //query key
-  {
-     KeyData = TKEY_DAT;                                      //
-#ifdef DE_PRINTF
-     printf("B.=  %04x\n",KeyData&0x7FFF);		
-#endif
-  }		
-	if (rotateFlag &&(KeyData < (TouchKeyButton-100)))	        //100 灵敏度调节					
-  {
-		HIDCom[0] += 0x01;	
-		UploadData();
+// extern void HIDValueHandle( void )
+// {
+// 	static UINT8 rotateFlag = 0;																// When upload keys complete, upload EP2 data
+//   UINT16 KeyData = TouchKeyButton;
+//   if(TKEY_CTRL&bTKC_IF)		                                    //query key
+//   {
+//      KeyData = TKEY_DAT;                                      //
+// #ifdef DE_PRINTF
+//      printf("B.=  %04x\n",KeyData&0x7FFF);		
+// #endif
+//   }		
+// 	if (rotateFlag &&(KeyData < (TouchKeyButton-100)))	        //100 灵敏度调节					
+//   {
+// 		HIDCom[0] += 0x01;	
+// 		UploadData();
 
-		Enp2IntIn();	
-	}			
-	else if(rotateFlag == 0)
-	{				
-        SendKey(pStr);																	     	 // Upload path
-		pStr++;	
-		if(*pStr == '\0')			
-		{
-			SendKey( "~" );																	     // Upload ALT+B
-			mDelaymS( 200 );	
-			rotateFlag = 1;
-		}		
-	}	
+// 		Enp2IntIn();	
+// 	}			
+// 	else if(rotateFlag == 0)
+// 	{				
+//         SendKey(pStr);																	     	 // Upload path
+// 		pStr++;	
+// 		if(*pStr == '\0')			
+// 		{
+// 			SendKey( "~" );																	     // Upload ALT+B
+// 			mDelaymS( 200 );	
+// 			rotateFlag = 1;
+// 		}		
+// 	}	
 
-}
+// }
 
 /**************************** END *************************************/
 
@@ -819,6 +820,44 @@ void usb_send_key (char *p)
 	while(FLAG == 0); 
 }
 
+
+void usb_send_keys_from_flash(void)
+{
+	UINT8 hid_report[8] = {0};
+	UINT8 read_len = 0;
+
+	// 从flash中读取8字节键值
+	read_len = ReadDataFlash(KEY_VALUES_OFFSET, 8, hid_report);
+	if (read_len != 8)
+	{
+		return;
+	}
+
+	// memcpy(HIDKey, g_key_values, 8);
+
+	// 发送按键按下报告
+	// 将hid_report内容复制到HIDKey
+    memcpy(HIDKey, hid_report, 8);
+
+    // 发送按键按下报告
+    while(FLAG == 0);
+    Enp1IntIn();
+    while(FLAG == 0);
+
+	// 延时模拟按下保持
+    mDelaymS(20);
+
+
+    // 松开按键
+    memset(HIDKey, 0, 8);
+    while(FLAG == 0);
+    Enp1IntIn();
+    while(FLAG == 0);
+
+
+}
+
+
 /**
  * @brief 计算从compound_data[1]开始的len - 1个字节的校验和
  * 
@@ -876,50 +915,6 @@ UINT8 usb_check_valid_packet(UINT8 *compound_data, UINT8 len)
 }
 
 
-// UINT8 usb_check_heartbeat_packet(UINT8 *compound_data, UINT8 len)
-// {
-
-// 	UINT8 i = 0;
-// 	if (compound_data[0] == 0x00 && compound_data[1] == 0x01)
-// 	{
-// 		;
-// 	}
-
-	// UINT8 i;
-    // // Iterate through the data buffer
-    // for (i = 0; i < len; i++)
-    // {
-    //     if (compound_data[i] == 0xAA)  // Check if any byte equals 0xAA
-    //     {
-    //         return 1;  // Found 0xAA, return 1
-    //     }
-    // }
-    // return 0;  // If no 0xAA is found, return 0
-//    UINT8 checksum = 0;
-//    UINT8 i;
-//    
-//    if (len != 10)
-//    {
-//        return 0;
-//    }
-//    if (compound_data[0] != PACKET_HEADER)
-//    {
-//        return 0;
-//    }
-//    if (compound_data[1] != PACKET_OPCODE_HEART)
-//    {
-//        return 0;
-//    }
-//    for (i = 0; i < len - 1; i++)
-//    {
-//        checksum += compound_data[i];
-//    }
-//    if (checksum != compound_data[len - 1])
-//    {
-//        return 0;
-//    }
-//    return 1;
-// }
 
 /**
  * @brief 
@@ -1086,12 +1081,101 @@ void compound_process_recv_data(UINT8 len)
 
 				break;
 			}
+			case USB_OP_WR_KEYVALUE:		/* 写入键值保存到flash，下一次从写入位置读取来发送键值 */
+			{
+				//UINT8 valid_keys = 0;
+				UINT8 key_values[8] = {0};
+
+				UINT8 saved_key_values[8] = {0};	/* 保存从flash中读取的键值，比较是否与将要写入的数据相同。如果相同，那就不写入了。如果不同，就更新需要写入的键值 */
+				UINT8 read_len = 0;
+				UINT8 erase_len = 0;
+				UINT8 write_len = 0;
+				UINT8 i = 0;
+				UINT8 length = 13;	// header + length + opcode + ERRCODE + DATA + checksum, 这里的DATA是8字节的从flash中读取的键值
+				UINT8 errcode = 0x00;	// success
+				UINT8 checksum = 0;
+
+				/* 1. 从协议包里解析出升级的键值，保存到了局部变量key_values里 */
+				memcpy(key_values, &compound_received_data[4], 8);
+				
+				/* 2. 保存到data flash里面 */
+
+				// 写之前先读取一次，比较是否与将要写入的数据相同
+				read_len = ReadDataFlash(KEY_VALUES_OFFSET, 8, saved_key_values);
+				if (read_len != 8)
+				{
+					break;
+				}
+
+				if (memcmp(key_values, saved_key_values, 8) == 0)
+				{
+					// 如果相同，那就不写入了
+					break;
+				}
+
+				// 擦除dataflash对应区域
+				erase_len = EraseDataFlash(KEY_VALUES_OFFSET, 8);
+				if (erase_len != 8)
+				{
+					break;
+				}
+
+				// 写入新的键值
+				write_len = WriteDataFlash(KEY_VALUES_OFFSET, key_values, 8);
+				if (write_len != 8)
+				{
+					break;
+				}
+
+				// 写完后再次读取，比较是否写入成功
+				read_len = ReadDataFlash(KEY_VALUES_OFFSET, 8, saved_key_values);
+				if (read_len != 8)
+				{
+					break;
+				}
+
+				memcpy(g_key_values, saved_key_values, 8);	// 更新全局变量缓存
+
+				// 新的键值写入之后，就需要写一个发送键值的函数了。因为是要考虑到发送组合按键的。
+
+				/* 3. 回复写入成功的响应包 */
+				// TODO: 组装写入成功的相应包，注意其他的都是失败的相应包
+				compound_response_data[0] = 0x01;		// 协议固定的，第一个字节得是0x01
+				compound_response_data[1] = PACKET_HEADER;
+				compound_response_data[2] = length;
+				compound_response_data[3] = opcode;
+				compound_response_data[4] = 0x00;	// ERRCODE = 0x00,表示成功
+
+				// 放入8字节data，即刚写入的键值
+				memcpy(&compound_response_data[5], saved_key_values, 8);
+
+				// 计算校验和，从[1]开始到[1+12=13 -1=12],即[1..12]
+				for (i = 1; i < (1+length); i++) // i从1到13-1=12
+				{
+					checksum += compound_response_data[i];
+				}
+				// 将校验和放在[1+length=14-1=13]位置
+				compound_response_data[5+8] = checksum; // 5+8=13，对应索引compound_response_data[13]
+
+				// 清空剩余空间(如果需要，这里数据正好64字节足够)
+				memset(&compound_response_data[14], 0, 64-14); 
+
+				// 发送数据
+				memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
+				UEP2_T_LEN = 64;
+				UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+
+				break;
+			}
 
 			default:
 			{
 				// 未知的OPCODE, 需要回复错误码
 				// 未知的OPCODE的data是空的
 				// ERRCODE = 0x01
+
+
+
 				break;
 			}
 
@@ -1106,77 +1190,7 @@ void compound_process_recv_data(UINT8 len)
         UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
 	}
 
-    // UINT8 checksum = 0;
-    // UINT8 i;  /* 移到函数开始处声明 */
-    
 
-	
-    // if (usb_check_heartbeat_packet(compound_received_data, len))
-    // {
-	// 	g_compound_heartbeat_timer = 0;
-	// 	g_compound_heartbeat_flag = 1;
-
-    //     // compound_response_data[0] = PACKET_HEADER;
-    //     // compound_response_data[1] = PACKET_OPCODE_HEART;
-    //     // compound_response_data[2] = VERSION_STR[0];
-    //     // compound_response_data[3] = VERSION_STR[2];
-    //     // compound_response_data[4] = VERSION_STR[4];
-    //     // compound_response_data[5] = DEVICE_VID_L;           
-    //     // compound_response_data[6] = DEVICE_VID_H;           
-    //     // compound_response_data[7] = DEVICE_PID_L;           
-    //     // compound_response_data[8] = DEVICE_PID_H;           
-        
-    //     // for(i = 0; i < 9; i++) 
-    //     // {
-    //     //     checksum += compound_response_data[i];
-    //     // }
-    //     // compound_response_data[9] = checksum;
-        
-    //     // memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 10);  
-    //     // UEP2_T_LEN = 10;
-    //     // UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-        
-    //     // if (!first_hb_flag)
-    //     // {
-    //     //     first_hb_flag = 1;
-    //     //     timer0_register_cb(led_flash_handler);
-    //     // }
-	// 	compound_response_data[0] = 0x01;
-	// 	compound_response_data[1] = PACKET_HEADER;
-    //     compound_response_data[2] = PACKET_OPCODE_HEART;
-    //     compound_response_data[3] = VERSION_STR[0];
-    //     compound_response_data[4] = VERSION_STR[2];
-    //     compound_response_data[5] = VERSION_STR[4];
-    //     compound_response_data[6] = DEVICE_VID_L;           
-    //     compound_response_data[7] = DEVICE_VID_H;           
-    //     compound_response_data[8] = DEVICE_PID_L;           
-    //     compound_response_data[9] = DEVICE_PID_H;           
-        
-    //     for(i = 1; i < 10; i++) 
-    //     {
-    //         checksum += compound_response_data[i];
-    //     }
-    //     compound_response_data[10] = checksum;
-    //     // 填充剩余的字节为0x00，直到64字节
-    //     memset(&compound_response_data[11], 0, 53);  // 64 - 11 = 53 
-
-    //     memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
-    //     UEP2_T_LEN = 64;
-    //     UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-        
-    //     if (!first_hb_flag)
-    //     {
-    //         first_hb_flag = 1;
-    //         timer0_register_cb(led_flash_handler);
-    //     }
-    // }
-    // else
-    // {
-    //     memcpy(compound_response_data, compound_received_data, len);
-    //     memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, len);
-    //     UEP2_T_LEN = len;
-    //     UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-    // }
 }
 
 

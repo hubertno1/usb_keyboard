@@ -2,7 +2,8 @@
 ".\obj\main.obj",
 ".\obj\DEBUG.obj",
 ".\obj\key.obj",
-".\obj\Timer.obj" 
+".\obj\Timer.obj",
+".\obj\DataFlash.obj" 
 TO ".\obj\Compound_Dev" 
 PRINT(".\list\Compound_Dev.m51") RAMSIZE(256) 
 DISABLEWARNING (16) 
