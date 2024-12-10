@@ -1,4 +1,4 @@
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 1   
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 1   
 
 
 C51 COMPILER V9.54, COMPILATION OF MODULE COMPOUND
@@ -62,7 +62,7 @@ line level    source
   48          USB_SETUP_REQ             SetupReqBuf;                                    // A buffer for Setup package.
   49          
   50          char code sPath[] = "`  C:\\HID_RECV.EXE   \r   ";                    // The path for the software. SPACE for delay
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 2   
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 2   
 
   51          char *pStr = sPath;
   52          
@@ -79,7 +79,7 @@ line level    source
   63          #define USB_OP_WL_CLEANMATCH    0X20
   64          #define USB_OP_WR_KEYVALUE      0X2F
   65          
-  66          #define VERSION_STR         "1.0.0"
+  66          #define VERSION_STR         "1.0.3"
   67          #define DEVICE_VID_L     0x31    // VIDµÍ×Ö½Ú
   68          #define DEVICE_VID_H     0x51    // VID¸ß×Ö½Ú
   69          #define DEVICE_PID_L     0x07    // PIDµÍ×Ö½Ú
@@ -126,7 +126,7 @@ line level    source
  109            0x05, 0x01,     // Usage page Generatic Desktop
  110            0x09, 0x06,     // Usage keyboard
  111            0xa1, 0x01,     // Collation Application
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 3   
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 3   
 
  112            0x05, 0x07,     // Usafe page (key code)
  113            0x19, 0xe0,     // Usage Min ( E0 -->  L_CTL)
@@ -190,7 +190,7 @@ line level    source
  171              0x07,0x05,0x81,0x03,0x08,0x00,0x0a,                                   // Endpoint Descriptor, 50ms
  172          
  173          //   0x09,0x02,0x29,0x00,0x01,0x01,0x00,0xA0,0x32,                        // Configure Descriptor 
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 4   
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 4   
 
  174          //    0x09,0x04,0x00,0x00,0x02,0x03,0x00,0x00,0x00,                         // Interface Descriptor, Composite d
              -evice£¬ 2 EPs
@@ -254,7 +254,7 @@ line level    source
  221          *******************************************************************************/
  222          static void Enp1IntIn( void )
  223          {     
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 5   
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 5   
 
  224   1          memcpy( Ep1Buffer, HIDKey, sizeof(HIDKey));                                   // Upload data
  225   1          UEP1_T_LEN = sizeof(HIDKey);                                                  // Upload length
@@ -318,7 +318,7 @@ line level    source
  280   4           }                                                                         
  281   3              case UIS_TOKEN_IN | 1:                                                      // Endpoint 1 upload
  282   3            UEP1_T_LEN = 0;                                                         // Reset length
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 6   
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 6   
 
  283   3                  UEP1_CTRL = UEP1_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_NAK;               // Default return NAK
  284   3                  FLAG = 1;                                                               // Upload complete flag
@@ -382,7 +382,7 @@ line level    source
  338   8                        len = sizeof( ComRepDesc );
  339   8                      }
  340   7                      else
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 7   
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 7   
 
  341   7                      {
  342   8                        len = 0xff;                                         // Add interface index, if required
@@ -446,7 +446,7 @@ line level    source
  398   8                         break;
  399   8                      case 0x01:
  400   8                         UEP1_CTRL = UEP1_CTRL & ~ (bUEP_R_TOG | MASK_UEP_R_RES) | UEP_R_RES_ACK;
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 8   
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 8   
 
  401   8                         break;
  402   8                      default:
@@ -510,7 +510,7 @@ line level    source
  460   8                      }
  461   7                      else
  462   7                      {
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 9   
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 9   
 
  463   8                        len = 0xFF;                                         // Error routing
  464   8                      }
@@ -574,7 +574,7 @@ line level    source
  516   4                      SetupLen -= len;
  517   4                      pDescr += len;
  518   4                      UEP0_T_LEN = len;
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 10  
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 10  
 
  519   4                      UEP0_CTRL ^= bUEP_T_TOG;                                                //Toggle Sysc flag 
  520   4                      break;
@@ -638,7 +638,7 @@ line level    source
  571   1          if( UIF_SUSPEND )                                                                   // USB Suspended and
              - Awake interrupt
  572   1          {   
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 11  
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 11  
 
  573   2              UIF_SUSPEND = 0;    
  574   2              if ( USB_MIS_ST & bUMS_SUSPEND )                                                // Suspended
@@ -702,7 +702,7 @@ line level    source
  628   3            case '\\':
  629   3              HIDKey[2] = 0x31;
  630   3              break;
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 12  
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 12  
 
  631   3            case ' ':
  632   3              HIDKey[2] = L_SHIFT;
@@ -766,7 +766,7 @@ line level    source
  690          *******************************************************************************/
  691          static void UploadData(void)
  692          {
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 13  
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 13  
 
  693   1        UINT8 i;
  694   1        for( i = 1; i < 64 ;i ++ )
@@ -830,7 +830,7 @@ line level    source
  752   1        else
  753   1          if( c >= '1' && c <= '9' )
  754   1            HIDKey[2] = c - '1' + 0X1E;
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 14  
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 14  
 
  755   1          else
  756   1          {
@@ -894,7 +894,7 @@ line level    source
  814   1        while(FLAG == 0);                                             
  815   1        mDelaymS( 20 );
  816   1        HIDKey[0] = 0X00;                 
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 15  
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 15  
 
  817   1        HIDKey[2] = 0X00;                                                             // Reset the key
  818   1        while(FLAG == 0);                                                       
@@ -958,7 +958,7 @@ line level    source
  876   2        }
  877   1      
  878   1        return checksum;
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 16  
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 16  
 
  879   1      }
  880          
@@ -1022,7 +1022,7 @@ line level    source
  935   1        if (usb_check_valid_packet(compound_received_data, len))  // ºÏ·¨Êý¾Ý°ü
  936   1        {
  937   2          // Êý¾Ý°üºÏ·¨£¬¼ÌÐø´¦Àí
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 17  
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 17  
 
  938   2          UINT8 opcode = compound_received_data[3];
  939   2      
@@ -1061,246 +1061,249 @@ line level    source
  972   4              compound_response_data[3] = opcode;
  973   4              compound_response_data[4] = 0x00; // ERRCODE = 0x00
  974   4      
- 975   4              compound_response_data[5] = VERSION_STR[0];
- 976   4              compound_response_data[6] = VERSION_STR[2];
- 977   4              compound_response_data[7] = VERSION_STR[4];
- 978   4              compound_response_data[8] = DEVICE_VID_L;
- 979   4              compound_response_data[9] = DEVICE_VID_H;
- 980   4              compound_response_data[10] = DEVICE_PID_L;
- 981   4              compound_response_data[11] = DEVICE_PID_H;
- 982   4      
- 983   4              // ¼ÆËãÐ£ÑéºÍ£¬¼ÆËã[1] ~ [11]µÄÐ£ÑéºÍ
- 984   4              for (i = 1; i < 12; i++)
- 985   4              {
- 986   5                checksum += compound_response_data[i];
- 987   5              }
- 988   4              compound_response_data[12] = checksum;
- 989   4      
- 990   4              // Ìî³äÊ£ÓàµÄ×Ö½ÚÎª0x00£¬Ö±µ½64×Ö½Ú
- 991   4              memset(&compound_response_data[13], 0, 51);  // 64 - 13 = 51
+ 975   4      //        compound_response_data[5] = VERSION_STR[0];
+ 976   4      //        compound_response_data[6] = VERSION_STR[2];
+ 977   4      //        compound_response_data[7] = VERSION_STR[4];
+ 978   4              compound_response_data[5] = 0x01;   // 01
+ 979   4              compound_response_data[6] = 0x00;   // 00
+ 980   4              compound_response_data[7] = 0x04;   // 03
+ 981   4              compound_response_data[8] = DEVICE_VID_L;
+ 982   4              compound_response_data[9] = DEVICE_VID_H;
+ 983   4              compound_response_data[10] = DEVICE_PID_L;
+ 984   4              compound_response_data[11] = DEVICE_PID_H;
+ 985   4      
+ 986   4              // ¼ÆËãÐ£ÑéºÍ£¬¼ÆËã[1] ~ [11]µÄÐ£ÑéºÍ
+ 987   4              for (i = 1; i < 12; i++)
+ 988   4              {
+ 989   5                checksum += compound_response_data[i];
+ 990   5              }
+ 991   4              compound_response_data[12] = checksum;
  992   4      
- 993   4              // ·¢ËÍÊý¾Ý
- 994   4              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
- 995   4                  UEP2_T_LEN = 64;
- 996   4                  UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
- 997   4      
- 998   4              break;
- 999   4            }
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 18  
+ 993   4              // Ìî³äÊ£ÓàµÄ×Ö½ÚÎª0x00£¬Ö±µ½64×Ö½Ú
+ 994   4              memset(&compound_response_data[13], 0, 51);  // 64 - 13 = 51
+ 995   4      
+ 996   4              // ·¢ËÍÊý¾Ý
+ 997   4              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
+ 998   4                  UEP2_T_LEN = 64;
+ 999   4                  UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 18  
 
-1000   3            case USB_OP_WL_LEARNMATCH:
-1001   3            {
-1002   4              // Ñ§Ï°Æ¥Åä
-1003   4              // Ñ§Ï°Æ¥ÅäÃ»ÓÐdata
-1004   4              // ERRCODE = 0x00
-1005   4      
-1006   4              // 1. ÒµÎñÂß¼­£¬Ñ§Ï°Æ¥ÅäÎÞÏß°´¼ü¿ØÖÆUSB¼üÅÌ
-1007   4              // À­µÍP1^6 4s£¬½øÈëÑ§Ï°Ä£Ê½£¬È»ºóÀ­¸ß
-1008   4              // Ê×ÏÈ¿¼ÂÇ×èÈû¿É²»¿ÉÒÔ¡£Èç¹û×èÈû4s£¬ÄÇÃ´¾Ã²»ÄÜ´¦ÀíÆäËûµÄÊý¾Ý°ü£¬Õâ»áÖ±½Óµ¼ÖÂÐÄÌø°üµÄ´¦ÀíÊ§°Ü£¬½ø¶øÖØÆ
+1000   4      
+1001   4              break;
+1002   4            }
+1003   3            case USB_OP_WL_LEARNMATCH:
+1004   3            {
+1005   4              // Ñ§Ï°Æ¥Åä
+1006   4              // Ñ§Ï°Æ¥ÅäÃ»ÓÐdata
+1007   4              // ERRCODE = 0x00
+1008   4      
+1009   4              // 1. ÒµÎñÂß¼­£¬Ñ§Ï°Æ¥ÅäÎÞÏß°´¼ü¿ØÖÆUSB¼üÅÌ
+1010   4              // À­µÍP1^6 4s£¬½øÈëÑ§Ï°Ä£Ê½£¬È»ºóÀ­¸ß
+1011   4              // Ê×ÏÈ¿¼ÂÇ×èÈû¿É²»¿ÉÒÔ¡£Èç¹û×èÈû4s£¬ÄÇÃ´¾Ã²»ÄÜ´¦ÀíÆäËûµÄÊý¾Ý°ü£¬Õâ»áÖ±½Óµ¼ÖÂÐÄÌø°üµÄ´¦ÀíÊ§°Ü£¬½ø¶øÖØÆ
              -ôUSBÉè±¸£¬ÕâÊÇ²»ÔÊÐíµÄ
-1009   4              // ËùÒÔ£¬±ØÐëÊ¹ÓÃ·Ç×èÈû·½·¨¡£Ïë·¨ÊÇÀûÓÃÔ­ÓÐµÄ¶¨Ê±Æ÷£¬Ô­À´µÄ¶¨Ê±Æ÷ÊÇ¶¨Ê±10ms£¬ÄÇ¾ÍÊÇ¿ÉÒÔÔÚÕâ¸öÖ÷³ÌÐòÀïÃ
+1012   4              // ËùÒÔ£¬±ØÐëÊ¹ÓÃ·Ç×èÈû·½·¨¡£Ïë·¨ÊÇÀûÓÃÔ­ÓÐµÄ¶¨Ê±Æ÷£¬Ô­À´µÄ¶¨Ê±Æ÷ÊÇ¶¨Ê±10ms£¬ÄÇ¾ÍÊÇ¿ÉÒÔÔÚÕâ¸öÖ÷³ÌÐòÀïÃ
              -æ×¢²á»Øµ÷º¯Êý£¬È»ºóÔÚ»Øµ÷º¯ÊýÀïÃæ¶¨Ê±4s£¬È»ºó¾ÍÊÇÖ÷³ÌÐòÀï4sºóÖ÷³ÌÐòÀïÀ´Ò»¸öÈ«¾Ö±äÁ¿ÖÃÎ»£¬
-1010   4              // ÉÏÎ»»úÏÂ·¢Ñ§Ï°ÃüÁî£¬×´Ì¬»ú½ÓÊÕµ½£¬Á¢¿Ì»Ø¸´usbÖ÷»ú¿ªÊ¼´¦ÀíÑ§Ï°£¬È»ºó½øÈëÑ§Ï°×´Ì¬£ºÀ­µÍP1.6 4s£¬È»ºóÀ
+1013   4              // ÉÏÎ»»úÏÂ·¢Ñ§Ï°ÃüÁî£¬×´Ì¬»ú½ÓÊÕµ½£¬Á¢¿Ì»Ø¸´usbÖ÷»ú¿ªÊ¼´¦ÀíÑ§Ï°£¬È»ºó½øÈëÑ§Ï°×´Ì¬£ºÀ­µÍP1.6 4s£¬È»ºóÀ
              -­¸ß£»Õâ¸öÔõÃ´Í¨¹ý·Ç×èÈûµÄ·½·¨ÊµÏÖÄØ£¿
-1011   4      
-1012   4              UINT8 checksum = 0;
-1013   4              UINT8 length = 5; // header + length + opcode + ERRCODE + checksum
-1014   4              UINT8 i = 0;
-1015   4      
-1016   4      
-1017   4              if (learnmatch_state == LEARNMATCH_STATE_IDLE)
-1018   4              {
-1019   5                WL_LEARN_PIN = 0;
-1020   5                learnmatch_state = LEARNMATCH_STATE_ACTIVE;
-1021   5                g_learnmatch_timer = 0;
-1022   5              }
-1023   4      
-1024   4              // 2. ×é×°ÏìÓ¦°ü²¢·¢ËÍ
-1025   4              compound_response_data[0] = 0x01;   // Ð­Òé¹Ì¶¨µÄ£¬µÚÒ»¸ö×Ö½ÚµÃÊÇ0x01
-1026   4              compound_response_data[1] = PACKET_HEADER;
-1027   4              compound_response_data[2] = length;
-1028   4              compound_response_data[3] = opcode;
-1029   4              compound_response_data[4] = 0x00; // ERRCODE = 0x00,±íÊ¾³É¹¦
-1030   4      
-1031   4              for (i = 1; i < 5; i++)
-1032   4              {
-1033   5                checksum += compound_response_data[i];
-1034   5              }
-1035   4              compound_response_data[5] = checksum;
-1036   4              memset(&compound_response_data[6], 0, 58);  // 64 - 6 = 58
-1037   4      
-1038   4              // ·¢ËÍÊý¾Ý
-1039   4              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
-1040   4              UEP2_T_LEN = 64;
-1041   4              UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-1042   4      
-1043   4              break;
-1044   4            }
-1045   3            case USB_OP_WL_CLEANMATCH:
-1046   3            {
-1047   4              // Çå¿ÕÆ¥Åä
-1048   4              // Çå¿ÕÆ¥ÅäÃ»ÓÐdata
-1049   4              // ERRCODE = 0x00
-1050   4              // Çå¿ÕÆ¥ÅäºÍÑ§Ï°Æ¥ÅäµÄÇø±ðÊÇ£¬Çå¿ÕÆ¥ÅäÊÇÀ­µÍ11s£¬È»ºóÀ­¸ß
-1051   4              UINT8 checksum = 0;
-1052   4              UINT8 length = 5; // header + length + opcode + ERRCODE + checksum
-1053   4              UINT8 i = 0;
-1054   4      
-1055   4      
-1056   4              if (cleanmatch_state == CLEANMATCH_STATE_IDLE)
-1057   4              {
-1058   5                WL_LEARN_PIN = 0;
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 19  
+1014   4      
+1015   4              UINT8 checksum = 0;
+1016   4              UINT8 length = 5; // header + length + opcode + ERRCODE + checksum
+1017   4              UINT8 i = 0;
+1018   4      
+1019   4      
+1020   4              if (learnmatch_state == LEARNMATCH_STATE_IDLE)
+1021   4              {
+1022   5                WL_LEARN_PIN = 0;
+1023   5                learnmatch_state = LEARNMATCH_STATE_ACTIVE;
+1024   5                g_learnmatch_timer = 0;
+1025   5              }
+1026   4      
+1027   4              // 2. ×é×°ÏìÓ¦°ü²¢·¢ËÍ
+1028   4              compound_response_data[0] = 0x01;   // Ð­Òé¹Ì¶¨µÄ£¬µÚÒ»¸ö×Ö½ÚµÃÊÇ0x01
+1029   4              compound_response_data[1] = PACKET_HEADER;
+1030   4              compound_response_data[2] = length;
+1031   4              compound_response_data[3] = opcode;
+1032   4              compound_response_data[4] = 0x00; // ERRCODE = 0x00,±íÊ¾³É¹¦
+1033   4      
+1034   4              for (i = 1; i < 5; i++)
+1035   4              {
+1036   5                checksum += compound_response_data[i];
+1037   5              }
+1038   4              compound_response_data[5] = checksum;
+1039   4              memset(&compound_response_data[6], 0, 58);  // 64 - 6 = 58
+1040   4      
+1041   4              // ·¢ËÍÊý¾Ý
+1042   4              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
+1043   4              UEP2_T_LEN = 64;
+1044   4              UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+1045   4      
+1046   4              break;
+1047   4            }
+1048   3            case USB_OP_WL_CLEANMATCH:
+1049   3            {
+1050   4              // Çå¿ÕÆ¥Åä
+1051   4              // Çå¿ÕÆ¥ÅäÃ»ÓÐdata
+1052   4              // ERRCODE = 0x00
+1053   4              // Çå¿ÕÆ¥ÅäºÍÑ§Ï°Æ¥ÅäµÄÇø±ðÊÇ£¬Çå¿ÕÆ¥ÅäÊÇÀ­µÍ11s£¬È»ºóÀ­¸ß
+1054   4              UINT8 checksum = 0;
+1055   4              UINT8 length = 5; // header + length + opcode + ERRCODE + checksum
+1056   4              UINT8 i = 0;
+1057   4      
+1058   4      
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 19  
 
-1059   5                cleanmatch_state = CLEANMATCH_STATE_ACTIVE;
-1060   5                g_cleanmatch_timer = 0;
-1061   5              }
-1062   4      
-1063   4              // 2. ×é×°ÏìÓ¦°ü²¢·¢ËÍ
-1064   4              compound_response_data[0] = 0x01;   // Ð­Òé¹Ì¶¨µÄ£¬µÚÒ»¸ö×Ö½ÚµÃÊÇ0x01
-1065   4              compound_response_data[1] = PACKET_HEADER;
-1066   4              compound_response_data[2] = length;
-1067   4              compound_response_data[3] = opcode;
-1068   4              compound_response_data[4] = 0x00; // ERRCODE = 0x00,±íÊ¾³É¹¦
-1069   4      
-1070   4              for (i = 1; i < 5; i++)
-1071   4              {
-1072   5                checksum += compound_response_data[i];
-1073   5              }
-1074   4              compound_response_data[5] = checksum;
-1075   4              memset(&compound_response_data[6], 0, 58);  // 64 - 6 = 58
-1076   4      
-1077   4              // ·¢ËÍÊý¾Ý
-1078   4              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
-1079   4              UEP2_T_LEN = 64;
-1080   4              UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-1081   4      
-1082   4              break;
-1083   4            }
-1084   3            case USB_OP_WR_KEYVALUE:    /* Ð´Èë¼üÖµ±£´æµ½flash£¬ÏÂÒ»´Î´ÓÐ´ÈëÎ»ÖÃ¶ÁÈ¡À´·¢ËÍ¼üÖµ */
-1085   3            {
-1086   4              //UINT8 valid_keys = 0;
-1087   4              UINT8 key_values[8] = {0};
-1088   4      
-1089   4              UINT8 saved_key_values[8] = {0};  /* ±£´æ´ÓflashÖÐ¶ÁÈ¡µÄ¼üÖµ£¬±È½ÏÊÇ·ñÓë½«ÒªÐ´ÈëµÄÊý¾ÝÏàÍ¬¡£Èç¹ûÏàÍ¬£¬Ä
+1059   4              if (cleanmatch_state == CLEANMATCH_STATE_IDLE)
+1060   4              {
+1061   5                WL_LEARN_PIN = 0;
+1062   5                cleanmatch_state = CLEANMATCH_STATE_ACTIVE;
+1063   5                g_cleanmatch_timer = 0;
+1064   5              }
+1065   4      
+1066   4              // 2. ×é×°ÏìÓ¦°ü²¢·¢ËÍ
+1067   4              compound_response_data[0] = 0x01;   // Ð­Òé¹Ì¶¨µÄ£¬µÚÒ»¸ö×Ö½ÚµÃÊÇ0x01
+1068   4              compound_response_data[1] = PACKET_HEADER;
+1069   4              compound_response_data[2] = length;
+1070   4              compound_response_data[3] = opcode;
+1071   4              compound_response_data[4] = 0x00; // ERRCODE = 0x00,±íÊ¾³É¹¦
+1072   4      
+1073   4              for (i = 1; i < 5; i++)
+1074   4              {
+1075   5                checksum += compound_response_data[i];
+1076   5              }
+1077   4              compound_response_data[5] = checksum;
+1078   4              memset(&compound_response_data[6], 0, 58);  // 64 - 6 = 58
+1079   4      
+1080   4              // ·¢ËÍÊý¾Ý
+1081   4              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
+1082   4              UEP2_T_LEN = 64;
+1083   4              UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+1084   4      
+1085   4              break;
+1086   4            }
+1087   3            case USB_OP_WR_KEYVALUE:    /* Ð´Èë¼üÖµ±£´æµ½flash£¬ÏÂÒ»´Î´ÓÐ´ÈëÎ»ÖÃ¶ÁÈ¡À´·¢ËÍ¼üÖµ */
+1088   3            {
+1089   4              //UINT8 valid_keys = 0;
+1090   4              UINT8 key_values[8] = {0};
+1091   4      
+1092   4              UINT8 saved_key_values[8] = {0};  /* ±£´æ´ÓflashÖÐ¶ÁÈ¡µÄ¼üÖµ£¬±È½ÏÊÇ·ñÓë½«ÒªÐ´ÈëµÄÊý¾ÝÏàÍ¬¡£Èç¹ûÏàÍ¬£¬Ä
              -Ç¾Í²»Ð´ÈëÁË¡£Èç¹û²»Í¬£¬¾Í¸üÐÂÐèÒªÐ´ÈëµÄ¼üÖµ */
-1090   4              UINT8 read_len = 0;
-1091   4              UINT8 erase_len = 0;
-1092   4              UINT8 write_len = 0;
-1093   4              UINT8 i = 0;
-1094   4              UINT8 length = 13;  // header + length + opcode + ERRCODE + DATA + checksum, ÕâÀïµÄDATAÊÇ8×Ö½ÚµÄ´Óflash
+1093   4              UINT8 read_len = 0;
+1094   4              UINT8 erase_len = 0;
+1095   4              UINT8 write_len = 0;
+1096   4              UINT8 i = 0;
+1097   4              UINT8 length = 13;  // header + length + opcode + ERRCODE + DATA + checksum, ÕâÀïµÄDATAÊÇ8×Ö½ÚµÄ´Óflash
              -ÖÐ¶ÁÈ¡µÄ¼üÖµ
-1095   4              UINT8 errcode = 0x00; // success
-1096   4              UINT8 checksum = 0;
-1097   4      
-1098   4              /* 1. ´ÓÐ­Òé°üÀï½âÎö³öÉý¼¶µÄ¼üÖµ£¬±£´æµ½ÁË¾Ö²¿±äÁ¿key_valuesÀï */
-1099   4              memcpy(key_values, &compound_received_data[4], 8);
-1100   4              
-1101   4              /* 2. ±£´æµ½data flashÀïÃæ */
-1102   4      
-1103   4              // Ð´Ö®Ç°ÏÈ¶ÁÈ¡Ò»´Î£¬±È½ÏÊÇ·ñÓë½«ÒªÐ´ÈëµÄÊý¾ÝÏàÍ¬
-1104   4              read_len = ReadDataFlash(KEY_VALUES_OFFSET, 8, saved_key_values);
-1105   4              if (read_len != 8)
-1106   4              {
-1107   5                break;
-1108   5              }
-1109   4      
-1110   4              if (memcmp(key_values, saved_key_values, 8) == 0)
-1111   4              {
-1112   5                // Èç¹ûÏàÍ¬£¬ÄÇ¾Í²»Ð´ÈëÁË
-1113   5                break;
-1114   5              }
-1115   4      
-1116   4              // ²Á³ýdataflash¶ÔÓ¦ÇøÓò
-1117   4              erase_len = EraseDataFlash(KEY_VALUES_OFFSET, 8);
-1118   4              if (erase_len != 8)
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 20  
+1098   4              UINT8 errcode = 0x00; // success
+1099   4              UINT8 checksum = 0;
+1100   4      
+1101   4              /* 1. ´ÓÐ­Òé°üÀï½âÎö³öÉý¼¶µÄ¼üÖµ£¬±£´æµ½ÁË¾Ö²¿±äÁ¿key_valuesÀï */
+1102   4              memcpy(key_values, &compound_received_data[4], 8);
+1103   4              
+1104   4              /* 2. ±£´æµ½data flashÀïÃæ */
+1105   4      
+1106   4              // Ð´Ö®Ç°ÏÈ¶ÁÈ¡Ò»´Î£¬±È½ÏÊÇ·ñÓë½«ÒªÐ´ÈëµÄÊý¾ÝÏàÍ¬
+1107   4              read_len = ReadDataFlash(KEY_VALUES_OFFSET, 8, saved_key_values);
+1108   4              if (read_len != 8)
+1109   4              {
+1110   5                break;
+1111   5              }
+1112   4      
+1113   4              if (memcmp(key_values, saved_key_values, 8) == 0)
+1114   4              {
+1115   5                // Èç¹ûÏàÍ¬£¬ÄÇ¾Í²»Ð´ÈëÁË
+1116   5                break;
+1117   5              }
+1118   4      
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 20  
 
-1119   4              {
-1120   5                break;
-1121   5              }
-1122   4      
-1123   4              // Ð´ÈëÐÂµÄ¼üÖµ
-1124   4              write_len = WriteDataFlash(KEY_VALUES_OFFSET, key_values, 8);
-1125   4              if (write_len != 8)
-1126   4              {
-1127   5                break;
-1128   5              }
-1129   4      
-1130   4              // Ð´ÍêºóÔÙ´Î¶ÁÈ¡£¬±È½ÏÊÇ·ñÐ´Èë³É¹¦
-1131   4              read_len = ReadDataFlash(KEY_VALUES_OFFSET, 8, saved_key_values);
-1132   4              if (read_len != 8)
-1133   4              {
-1134   5                break;
-1135   5              }
-1136   4      
-1137   4              memcpy(g_key_values, saved_key_values, 8);  // ¸üÐÂÈ«¾Ö±äÁ¿»º´æ
-1138   4      
-1139   4              // ÐÂµÄ¼üÖµÐ´ÈëÖ®ºó£¬¾ÍÐèÒªÐ´Ò»¸ö·¢ËÍ¼üÖµµÄº¯ÊýÁË¡£ÒòÎªÊÇÒª¿¼ÂÇµ½·¢ËÍ×éºÏ°´¼üµÄ¡£
-1140   4      
-1141   4              /* 3. »Ø¸´Ð´Èë³É¹¦µÄÏìÓ¦°ü */
-1142   4              // TODO: ×é×°Ð´Èë³É¹¦µÄÏàÓ¦°ü£¬×¢ÒâÆäËûµÄ¶¼ÊÇÊ§°ÜµÄÏàÓ¦°ü
-1143   4              compound_response_data[0] = 0x01;   // Ð­Òé¹Ì¶¨µÄ£¬µÚÒ»¸ö×Ö½ÚµÃÊÇ0x01
-1144   4              compound_response_data[1] = PACKET_HEADER;
-1145   4              compound_response_data[2] = length;
-1146   4              compound_response_data[3] = opcode;
-1147   4              compound_response_data[4] = 0x00; // ERRCODE = 0x00,±íÊ¾³É¹¦
-1148   4      
-1149   4              // ·ÅÈë8×Ö½Údata£¬¼´¸ÕÐ´ÈëµÄ¼üÖµ
-1150   4              memcpy(&compound_response_data[5], saved_key_values, 8);
+1119   4              // ²Á³ýdataflash¶ÔÓ¦ÇøÓò
+1120   4              erase_len = EraseDataFlash(KEY_VALUES_OFFSET, 8);
+1121   4              if (erase_len != 8)
+1122   4              {
+1123   5                break;
+1124   5              }
+1125   4      
+1126   4              // Ð´ÈëÐÂµÄ¼üÖµ
+1127   4              write_len = WriteDataFlash(KEY_VALUES_OFFSET, key_values, 8);
+1128   4              if (write_len != 8)
+1129   4              {
+1130   5                break;
+1131   5              }
+1132   4      
+1133   4              // Ð´ÍêºóÔÙ´Î¶ÁÈ¡£¬±È½ÏÊÇ·ñÐ´Èë³É¹¦
+1134   4              read_len = ReadDataFlash(KEY_VALUES_OFFSET, 8, saved_key_values);
+1135   4              if (read_len != 8)
+1136   4              {
+1137   5                break;
+1138   5              }
+1139   4      
+1140   4              memcpy(g_key_values, saved_key_values, 8);  // ¸üÐÂÈ«¾Ö±äÁ¿»º´æ
+1141   4      
+1142   4              // ÐÂµÄ¼üÖµÐ´ÈëÖ®ºó£¬¾ÍÐèÒªÐ´Ò»¸ö·¢ËÍ¼üÖµµÄº¯ÊýÁË¡£ÒòÎªÊÇÒª¿¼ÂÇµ½·¢ËÍ×éºÏ°´¼üµÄ¡£
+1143   4      
+1144   4              /* 3. »Ø¸´Ð´Èë³É¹¦µÄÏìÓ¦°ü */
+1145   4              // TODO: ×é×°Ð´Èë³É¹¦µÄÏàÓ¦°ü£¬×¢ÒâÆäËûµÄ¶¼ÊÇÊ§°ÜµÄÏàÓ¦°ü
+1146   4              compound_response_data[0] = 0x01;   // Ð­Òé¹Ì¶¨µÄ£¬µÚÒ»¸ö×Ö½ÚµÃÊÇ0x01
+1147   4              compound_response_data[1] = PACKET_HEADER;
+1148   4              compound_response_data[2] = length;
+1149   4              compound_response_data[3] = opcode;
+1150   4              compound_response_data[4] = 0x00; // ERRCODE = 0x00,±íÊ¾³É¹¦
 1151   4      
-1152   4              // ¼ÆËãÐ£ÑéºÍ£¬´Ó[1]¿ªÊ¼µ½[1+12=13 -1=12],¼´[1..12]
-1153   4              for (i = 1; i < (1+length); i++) // i´Ó1µ½13-1=12
-1154   4              {
-1155   5                checksum += compound_response_data[i];
-1156   5              }
-1157   4              // ½«Ð£ÑéºÍ·ÅÔÚ[1+length=14-1=13]Î»ÖÃ
-1158   4              compound_response_data[5+8] = checksum; // 5+8=13£¬¶ÔÓ¦Ë÷Òýcompound_response_data[13]
-1159   4      
-1160   4              // Çå¿ÕÊ£Óà¿Õ¼ä(Èç¹ûÐèÒª£¬ÕâÀïÊý¾ÝÕýºÃ64×Ö½Ú×ã¹»)
-1161   4              memset(&compound_response_data[14], 0, 64-14); 
+1152   4              // ·ÅÈë8×Ö½Údata£¬¼´¸ÕÐ´ÈëµÄ¼üÖµ
+1153   4              memcpy(&compound_response_data[5], saved_key_values, 8);
+1154   4      
+1155   4              // ¼ÆËãÐ£ÑéºÍ£¬´Ó[1]¿ªÊ¼µ½[1+12=13 -1=12],¼´[1..12]
+1156   4              for (i = 1; i < (1+length); i++) // i´Ó1µ½13-1=12
+1157   4              {
+1158   5                checksum += compound_response_data[i];
+1159   5              }
+1160   4              // ½«Ð£ÑéºÍ·ÅÔÚ[1+length=14-1=13]Î»ÖÃ
+1161   4              compound_response_data[5+8] = checksum; // 5+8=13£¬¶ÔÓ¦Ë÷Òýcompound_response_data[13]
 1162   4      
-1163   4              // ·¢ËÍÊý¾Ý
-1164   4              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
-1165   4              UEP2_T_LEN = 64;
-1166   4              UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-1167   4      
-1168   4              break;
-1169   4            }
-1170   3      
-1171   3            default:
-1172   3            {
-1173   4              // Î´ÖªµÄOPCODE, ÐèÒª»Ø¸´´íÎóÂë
-1174   4              // Î´ÖªµÄOPCODEµÄdataÊÇ¿ÕµÄ
-1175   4              // ERRCODE = 0x01
-1176   4      
-1177   4      
-1178   4      
-1179   4              break;
-1180   4            }
-C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 15:33:21 PAGE 21  
+1163   4              // Çå¿ÕÊ£Óà¿Õ¼ä(Èç¹ûÐèÒª£¬ÕâÀïÊý¾ÝÕýºÃ64×Ö½Ú×ã¹»)
+1164   4              memset(&compound_response_data[14], 0, 64-14); 
+1165   4      
+1166   4              // ·¢ËÍÊý¾Ý
+1167   4              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, 64);  
+1168   4              UEP2_T_LEN = 64;
+1169   4              UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+1170   4      
+1171   4              break;
+1172   4            }
+1173   3      
+1174   3            default:
+1175   3            {
+1176   4              // Î´ÖªµÄOPCODE, ÐèÒª»Ø¸´´íÎóÂë
+1177   4              // Î´ÖªµÄOPCODEµÄdataÊÇ¿ÕµÄ
+1178   4              // ERRCODE = 0x01
+1179   4      
+1180   4      
+C51 COMPILER V9.54   COMPOUND                                                              12/06/2024 18:18:26 PAGE 21  
 
-1181   3      
-1182   3          }
-1183   2      
-1184   2        }
-1185   1        else  // ·Ç·¨Êý¾Ý°ü echoÄ£Ê½
-1186   1        {
-1187   2              memcpy(compound_response_data, compound_received_data, len);
-1188   2              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, len);
-1189   2              UEP2_T_LEN = len;
-1190   2              UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
-1191   2        }
-1192   1      
-1193   1      
-1194   1      }
-1195          
-1196          
+1181   4      
+1182   4              break;
+1183   4            }
+1184   3      
+1185   3          }
+1186   2      
+1187   2        }
+1188   1        else  // ·Ç·¨Êý¾Ý°ü echoÄ£Ê½
+1189   1        {
+1190   2              memcpy(compound_response_data, compound_received_data, len);
+1191   2              memcpy(&Ep2Buffer[BUFFER_SIZE], compound_response_data, len);
+1192   2              UEP2_T_LEN = len;
+1193   2              UEP2_CTRL = (UEP2_CTRL & ~MASK_UEP_T_RES) | UEP_T_RES_ACK;
+1194   2        }
+1195   1      
+1196   1      
+1197   1      }
+1198          
+1199          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   3170    ----
-   CONSTANT SIZE    =    239    ----
+   CODE SIZE        =   3144    ----
+   CONSTANT SIZE    =    233    ----
    XDATA SIZE       =    238      46
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----

@@ -63,7 +63,7 @@ volatile UINT8 g_data_len;
 #define USB_OP_WL_CLEANMATCH		0X20
 #define USB_OP_WR_KEYVALUE 			0X2F
 
-#define VERSION_STR 				"1.0.0"
+#define VERSION_STR 				"1.0.3"
 #define DEVICE_VID_L     0x31    // VID低字节
 #define DEVICE_VID_H     0x51    // VID高字节
 #define DEVICE_PID_L     0x07    // PID低字节
@@ -972,9 +972,12 @@ void compound_process_recv_data(UINT8 len)
 				compound_response_data[3] = opcode;
 				compound_response_data[4] = 0x00;	// ERRCODE = 0x00
 
-				compound_response_data[5] = VERSION_STR[0];
-				compound_response_data[6] = VERSION_STR[2];
-				compound_response_data[7] = VERSION_STR[4];
+//				compound_response_data[5] = VERSION_STR[0];
+//				compound_response_data[6] = VERSION_STR[2];
+//				compound_response_data[7] = VERSION_STR[4];
+				compound_response_data[5] = 0x01;		// 01
+				compound_response_data[6] = 0x00;		// 00
+				compound_response_data[7] = 0x04;		// 03
 				compound_response_data[8] = DEVICE_VID_L;
 				compound_response_data[9] = DEVICE_VID_H;
 				compound_response_data[10] = DEVICE_PID_L;

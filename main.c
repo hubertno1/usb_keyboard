@@ -63,21 +63,84 @@ void handle_key_event(key_event_t event)
   {
       case KEY_EVENT_PRESSED:
       {
-          // usb_send_key("a");
-          usb_send_keys_from_flash();
-		    LED1 = 0;
-			mDelaymS(10);
-			LED1 = 1;
-			mDelaymS(10);
+            UINT8 key_vals[8] = {0};
+            UINT8 read_len = ReadDataFlash(KEY_VALUES_OFFSET, 8, key_vals);
+            if (read_len == 8)
+            {
+                // ??key_vals????0xFF(??????????????)
+                UINT8 i;
+                UINT8 is_empty = 1;
+                for (i = 0; i < 8; i++)
+                {
+                    if (key_vals[i] != 0xFF)
+                    {
+                        is_empty = 0;
+                        break;
+                    }
+                }
 
+                if (is_empty)
+                {
+                    // Flash??????????,?????'#'??
+                    usb_send_key("#");
+                }
+                else
+                {
+                    // Flash?????????,?????flash????????
+                    usb_send_keys_from_flash();
+                }
+            }
+            else
+            {
+                // ????,????:??'#'???????
+                usb_send_key("#");
+            }
 
-          break;
+            LED1 = 0;
+            mDelaymS(10);
+            LED1 = 1;
+            mDelaymS(10);
+
+            break;
       }
 
       case KEY_EVENT_RELEASED:
       {
-          //usb_send_key("a");
-          usb_send_keys_from_flash();
+				            UINT8 key_vals[8] = {0};
+            UINT8 read_len = ReadDataFlash(KEY_VALUES_OFFSET, 8, key_vals);
+            if (read_len == 8)
+            {
+                // ??key_vals????0xFF(??????????????)
+                UINT8 i;
+                UINT8 is_empty = 1;
+                for (i = 0; i < 8; i++)
+                {
+                    if (key_vals[i] != 0xFF)
+                    {
+                        is_empty = 0;
+                        break;
+                    }
+                }
+
+                if (is_empty)
+                {
+                    // Flash??????????,?????'#'??
+                    usb_send_key("#");
+                }
+                else
+                {
+                    // Flash?????????,?????flash????????
+                    usb_send_keys_from_flash();
+                }
+            }
+            else
+            {
+                // ????,????:??'#'???????
+                usb_send_key("#");
+            }
+				
+          //usb_send_key("#");
+          //usb_send_keys_from_flash();
 		  	LED1 = 0;
 			mDelaymS(10);
 			LED1 = 1;
